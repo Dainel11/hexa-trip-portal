@@ -27,7 +27,7 @@
   --water: #5aa6c4;
 }
 
-html { -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; font-size: 17px; } /* tune this to scale ALL text bigger/smaller */
 body {
   background: var(--canvas);
   color: var(--ink);

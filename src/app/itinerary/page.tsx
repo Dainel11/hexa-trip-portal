@@ -1,7 +1,8 @@
-import { getItinerary } from "@/lib/sheets";
+import { getItinerary, getEventInfo } from "@/lib/sheets";
 import PageHeader from "@/components/PageHeader";
 import PrintButton from "@/components/PrintButton";
 import EmptyState from "@/components/EmptyState";
+import SmartImage from "@/components/SmartImage";
 import { Pill } from "@/components/Card";
 import { groupBy } from "@/lib/format";
 
@@ -9,17 +10,26 @@ export const revalidate = 60;
 export const metadata = { title: "Itinerary" };
 
 export default async function Page() {
-  const items = await getItinerary();
+  const [items, info] = await Promise.all([getItinerary(), getEventInfo()]);
+  const poster = info.itinerary_poster;
   const days = groupBy(items, (i) => i.date);
+
   return (
     <>
       <PageHeader eyebrow="01 · Schedule" title="Itinerary"
-        intro="The full run of the trip, day by day. Tap print for a paper copy to pin on the board.">
+        intro="Jadual penuh perjalanan. Tekan print untuk salinan kertas.">
         <PrintButton />
       </PageHeader>
+
       <div className="print-area mx-auto max-w-content px-4 py-8">
-        {items.length === 0 ? (
-          <EmptyState title="No itinerary yet" hint="HR can fill the Itinerary tab in the sheet and it will appear here." />
+        {poster && (
+          <figure className="mb-10 overflow-hidden rounded-2xl border border-line bg-surface">
+            <SmartImage src={poster} alt="Itinerary poster" className="w-full object-contain" />
+          </figure>
+        )}
+
+        {items.length === 0 && !poster ? (
+          <EmptyState title="No itinerary yet" hint="HR can fill the Itinerary tab, or add an itinerary_poster image in EventInfo." />
         ) : (
           [...days.entries()].map(([day, rows]) => (
             <section key={day} className="mb-10">

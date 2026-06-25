@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Safari field-guide palette — warm savanna paper + fresh emerald + amber sun */
+  --canvas: #f7f3ea;
+  --surface: #ffffff;
+  --ink: #1b2a2e;
+  --muted: #5c6b66;
+  --line: #e4ddcd;
+  --brand: #0e6e5c;       /* deep emerald — foliage / fresh produce */
+  --brand-soft: #d7eae3;
+  --amber: #d9851f;       /* savanna sun — accents, day 1 safari */
+  --water: #2b6f8c;       /* day 2 waterpark */
+}
+
+.dark {
+  --canvas: #0f1714;
+  --surface: #16201c;
+  --ink: #e8ede8;
+  --muted: #9bada6;
+  --line: #25322d;
+  --brand: #3bbf9f;
+  --brand-soft: #14302a;
+  --amber: #e7a34a;
+  --water: #5aa6c4;
+}
+
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--canvas);
+  color: var(--ink);
+  font-feature-settings: "ss01", "cv01";
+  text-rendering: optimizeLegibility;
+}
+
+/* Topographic contour texture used behind page headers (resort-map feel). */
+.contour {
+  background-image:
+    radial-gradient(120% 120% at 80% -10%, color-mix(in srgb, var(--brand) 14%, transparent), transparent 60%),
+    radial-gradient(90% 90% at 0% 110%, color-mix(in srgb, var(--amber) 12%, transparent), transparent 55%);
+}
+
+/* Mono field-tag, e.g. ROOM · FS 1 */
+.tag {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Hide scrollbar on the horizontal nav rail */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .reveal { animation: rise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+}
+
+/* ── Print: itinerary only, clean A4 ── */
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff; color: #000; }
+  .print-area { box-shadow: none !important; border: none !important; }
+  a[href]::after { content: ""; }
+  @page { margin: 16mm; }
+}

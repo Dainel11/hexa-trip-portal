@@ -23,3 +23,8 @@ export function VehicleIcon({ vehicle, className = base }: { vehicle: string; cl
   if (v.includes("VAN")) return <VanIcon className={className} />;
   return <CarIcon className={className} />;
 }
+
+export function FacebookIcon({ className = base }: P) { return (<svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden><path d="M13.5 21v-7h2.3l.4-2.8h-2.7V9.4c0-.8.2-1.4 1.4-1.4h1.4V5.5C16 5.4 15.1 5.3 14.1 5.3c-2.1 0-3.6 1.3-3.6 3.7v2.2H8.2V14h2.3v7z"/></svg>); }
+export function InstagramIcon({ className = base }: P) { return (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className} aria-hidden><rect x="4" y="4" width="16" height="16" rx="4.5"/><circle cx="12" cy="12" r="3.4"/><circle cx="16.7" cy="7.3" r="1" fill="currentColor" stroke="none"/></svg>); }
+export function WhatsappIcon({ className = base }: P) { return (<svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden><path d="M12 3a9 9 0 0 0-7.7 13.6L3 21l4.6-1.2A9 9 0 1 0 12 3zm0 2a7 7 0 0 1 5.9 10.8l-.3.4.6 2.2-2.3-.6-.4.2A7 7 0 1 1 12 5zm-2.7 3.3c-.2 0-.5 0-.7.4-.2.4-.9.9-.9 2.1s.9 2.5 1 2.6c.1.2 1.7 2.8 4.3 3.7 2.1.8 2.6.6 3 .6.5 0 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1-.1-.1-.3-.2-.6-.3-.3-.2-1.3-.6-1.5-.7-.2-.1-.4-.1-.5.1l-.7.9c-.1.1-.3.2-.5.1-.6-.2-1.3-.5-2-1.2-.5-.5-.9-1.1-1-1.3-.1-.2 0-.3.1-.4l.3-.4c.1-.1.1-.3.2-.4 0-.2 0-.3 0-.4l-.6-1.6c-.2-.4-.3-.4-.5-.4z"/></svg>); }
+export function TiktokIcon({ className = base }: P) { return (<svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden><path d="M16 3c.3 1.8 1.4 3.2 3 3.5v2.4c-1.1.1-2.1-.2-3-.7v5.6a5.3 5.3 0 1 1-5.3-5.3c.3 0 .5 0 .8.1v2.5c-.3-.1-.5-.1-.8-.1a2.8 2.8 0 1 0 2.8 2.8V3z"/></svg>); }

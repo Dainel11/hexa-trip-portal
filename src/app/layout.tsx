@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description: "Everything you need for the company trip — rooms, transport, schedule and more.",
   // 2. TUKAR IKON BUMI KEPADA LOGO HEXA DI SINI
   icons: {
-    icon: "https://www.image2url.com/r2/default/images/1782449872511-30bede3a-833e-4bf1-838a-51044a1130b7.ico",
+    icon: "https://www.image2url.com/r2/default/images/1782454748925-3ab66fce-d143-4d76-a87e-ee27db7c35c4.ico",
   },
 };
 export const viewport: Viewport = { themeColor: "#0e6e5c", width: "device-width", initialScale: 1 };

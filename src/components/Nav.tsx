@@ -15,7 +15,7 @@ const bottomIcon = (k: string, cn: string) =>
 export default function Nav({ logo }: { logo?: string }) {
   const path = usePathname();
   const [open, setOpen] = useState(false);
-  const logoUrl = toRenderableImage(logo);
+  const logoUrl = toRenderableImage((logo || "").trim());
 
   return (
     <>

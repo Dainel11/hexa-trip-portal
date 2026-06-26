@@ -1,29 +1,40 @@
 import Link from "next/link";
-import { getEventInfo, getContacts } from "@/lib/sheets";
+import { getEventInfo, getContacts, getItinerary } from "@/lib/sheets";
 import { NAV } from "@/lib/config";
 import SmartImage from "@/components/SmartImage";
 import Countdown from "@/components/Countdown";
 import { Pill } from "@/components/Card";
-import { displayPhone, telHref } from "@/lib/format";
+import { displayPhone, telHref, groupBy } from "@/lib/format";
 import { PhoneIcon } from "@/components/icons";
 
 export const revalidate = 60;
 
+function dayKey(d: string): string {
+  const t = Date.parse(d.replace(/^[A-Za-z]+,\s*/, ""));
+  return isNaN(t) ? "" : new Date(t).toDateString();
+}
+
 export default async function Home() {
-  const [info, contacts] = await Promise.all([getEventInfo(), getContacts()]);
+  const [info, contacts, itinerary] = await Promise.all([getEventInfo(), getContacts(), getItinerary()]);
   const dates = [info.startDate, info.endDate].filter(Boolean).join(" – ");
   const quick = NAV.filter((n) => n.href !== "/");
   const emergency = contacts.slice(0, 4);
 
+  // Smart card: today's schedule (falls back to Day 1 preview before the trip)
+  const today = new Date().toDateString();
+  const todays = itinerary.filter((i) => dayKey(i.date) === today);
+  const days = [...groupBy(itinerary, (i) => i.date).entries()];
+  const isToday = todays.length > 0;
+  const scheduleDay = isToday ? todays : (days[0]?.[1] ?? []);
+  const scheduleLabel = isToday ? "Today's schedule" : days[0] ? `Day 1 · ${days[0][0]}` : "";
+
   return (
     <>
       <section className="contour border-b border-line">
-        <div className="mx-auto grid max-w-content gap-6 px-4 py-8 sm:py-10 lg:grid-cols-[1.3fr_1fr] lg:items-center">
+        <div className="mx-auto grid max-w-content items-center gap-6 px-4 py-8 sm:py-10 lg:grid-cols-[1.2fr_1fr]">
           <div className="reveal">
             <p className="tag text-brand">Company Trip · Field Guide</p>
-            <h1 className="mt-2 font-display text-3xl font-semibold leading-[1.05] tracking-tight sm:text-5xl">
-              {info.eventName || "Company Trip"}
-            </h1>
+            <h1 className="mt-2 font-display text-3xl font-semibold leading-[1.05] tracking-tight sm:text-5xl">{info.eventName || "Company Trip"}</h1>
             {info.tagline && <p className="mt-3 max-w-xl text-muted">{info.tagline}</p>}
             <div className="mt-4 flex flex-wrap gap-2">
               {info.location && <Pill tone="brand">📍 {info.location}</Pill>}
@@ -31,8 +42,8 @@ export default async function Home() {
             </div>
           </div>
           {info.heroImage && (
-            <div className="reveal overflow-hidden rounded-2xl border border-line shadow-sm">
-              <SmartImage src={info.heroImage} alt={info.eventName} className="h-44 w-full object-cover sm:h-56" />
+            <div className="reveal overflow-hidden rounded-2xl border border-line bg-surface shadow-sm">
+              <SmartImage src={info.heroImage} alt={info.eventName} className="mx-auto max-h-72 w-full object-contain" />
             </div>
           )}
         </div>
@@ -41,6 +52,23 @@ export default async function Home() {
       <div className="mx-auto max-w-content space-y-10 px-4 py-8">
         {info.startDate && <Countdown date={info.startDate} />}
 
+        {scheduleDay.length > 0 && (
+          <section className="rounded-2xl border border-line bg-surface p-5">
+            <div className="flex items-center justify-between">
+              <p className="tag text-brand">{scheduleLabel}</p>
+              <Link href="/itinerary" className="text-sm font-medium text-brand hover:underline">View full →</Link>
+            </div>
+            <ol className="mt-4 space-y-2.5">
+              {scheduleDay.slice(0, 6).map((it, i) => (
+                <li key={i} className="flex gap-3 text-sm">
+                  <span className="w-24 shrink-0 font-mono text-xs text-brand">{it.time || "—"}</span>
+                  <span className="font-medium">{it.activity}</span>
+                </li>
+              ))}
+            </ol>
+          </section>
+        )}
+
         {emergency.length > 0 && (
           <section>
             <p className="tag text-muted">Need help? Call a contact person</p>
@@ -48,10 +76,7 @@ export default async function Home() {
               {emergency.map((c, i) => (
                 <a key={i} href={telHref(c.phone)} className="flex items-center gap-3 rounded-2xl border border-line bg-surface p-4 transition hover:border-brand">
                   <span className="grid h-10 w-10 place-items-center rounded-full bg-brand-soft text-brand"><PhoneIcon /></span>
-                  <span className="flex-1">
-                    <span className="block font-medium">{c.name}</span>
-                    <span className="tag text-muted">{c.role}</span>
-                  </span>
+                  <span className="flex-1"><span className="block font-medium">{c.name}</span><span className="tag text-muted">{c.role}</span></span>
                   <span className="font-mono text-sm text-brand">{displayPhone(c.phone)}</span>
                 </a>
               ))}

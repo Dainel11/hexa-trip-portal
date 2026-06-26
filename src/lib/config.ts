@@ -11,7 +11,7 @@ export const TABS = {
   dosDonts: "DosDonts", parking: "Parking", settings: "Settings",
 } as const;
 
-/** Full navigation (desktop bar + mobile "More" drawer). */
+/** Full navigation (Allowance + Contacts removed — info lives on Home/Transport). */
 export const NAV = [
   { href: "/", label: "Overview", code: "00" },
   { href: "/itinerary", label: "Itinerary", code: "01" },
@@ -20,12 +20,9 @@ export const NAV = [
   { href: "/shirts", label: "Shirts & Dress Code", code: "04" },
   { href: "/locations", label: "Locations", code: "05" },
   { href: "/payment", label: "Payment", code: "06" },
-  { href: "/allowance", label: "Allowance", code: "07" },
-  { href: "/contacts", label: "Contacts", code: "08" },
-  { href: "/dos-donts", label: "Do's & Don'ts", code: "09" },
+  { href: "/dos-donts", label: "Do's & Don'ts", code: "07" },
 ] as const;
 
-/** Mobile bottom-bar shortcuts (the 5 most-used + More). */
 export const BOTTOM_NAV = [
   { href: "/", label: "Home", icon: "home" },
   { href: "/itinerary", label: "Itinerary", icon: "calendar" },

@@ -4,7 +4,7 @@ import { NAV } from "@/lib/config";
 import SmartImage from "@/components/SmartImage";
 import Countdown from "@/components/Countdown";
 import { Pill } from "@/components/Card";
-import { displayPhone, telHref, groupBy } from "@/lib/format";
+import { phoneDisplay, telHref, groupBy } from "@/lib/format";
 import { PhoneIcon } from "@/components/icons";
 
 export const revalidate = 60;
@@ -77,7 +77,7 @@ export default async function Home() {
                 <a key={i} href={telHref(c.phone)} className="flex items-center gap-3 rounded-2xl border border-line bg-surface p-4 transition hover:border-brand">
                   <span className="grid h-10 w-10 place-items-center rounded-full bg-brand-soft text-brand"><PhoneIcon /></span>
                   <span className="flex-1"><span className="block font-medium">{c.name}</span><span className="tag text-muted">{c.role}</span></span>
-                  <span className="font-mono text-sm text-brand">{displayPhone(c.phone)}</span>
+                  <span className="font-mono text-sm text-brand">{phoneDisplay(c.phone)}</span>
                 </a>
               ))}
             </div>

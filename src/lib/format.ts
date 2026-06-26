@@ -5,11 +5,17 @@ export function rm(value: string | number | undefined): string {
   return `RM ${n.toLocaleString("en-MY", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
 }
 
+/** Ensure a leading "+" even if Google Sheets stripped it from a numeric cell. */
+export function displayPhone(phone: string): string {
+  let t = (phone ?? "").trim();
+  if (!t) return "";
+  if (!t.startsWith("+")) t = "+" + t.replace(/^\++/, "");
+  return t;
+}
 export function telHref(phone: string): string {
-  return "tel:" + phone.replace(/[^\d+]/g, "");
+  return "tel:" + displayPhone(phone).replace(/[^\d+]/g, "");
 }
 
-/** Group an array of rows by a key, preserving first-seen order. */
 export function groupBy<T>(rows: T[], key: (r: T) => string): Map<string, T[]> {
   const map = new Map<string, T[]>();
   for (const r of rows) {

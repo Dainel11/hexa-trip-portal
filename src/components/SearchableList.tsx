@@ -100,8 +100,8 @@ function TransportView({ rows }: { rows: Item[] }) {
       {[...byVeh.entries()].map(([veh, ppl]) => (
         <div key={veh} className="rounded-2xl border border-line bg-surface p-5">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-water/15 text-water"><VehicleIcon vehicle={veh} /></span>
-            <span className="font-display text-lg font-semibold">{veh}</span>
+            <span className="grid h-12 w-12 place-items-center rounded-xl bg-water/15 text-water"><VehicleIcon vehicle={veh} className="h-7 w-7" /></span>
+            <span className="font-display text-xl font-semibold">{veh}</span>
             {ppl[0]?.["plate"] && <span className="tag text-muted">{ppl[0]["plate"]}</span>}
             <span className="ml-auto tag text-muted">{ppl.length} pax</span>
           </div>

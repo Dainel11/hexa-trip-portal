@@ -12,8 +12,13 @@ const body = Inter({ subsets: ["latin"], variable: "--font-body", display: "swap
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
 
 export const metadata: Metadata = {
-  title: { default: SITE_NAME, template: `%s · ${SITE_NAME}` },
+  // 1. TUKAR NAMA PORTAL DI SINI (Contoh: HEXA Hub atau HEXA Corporate Trip)
+  title: { default: "HEXA Go", template: `%s · HEXA Go` },
   description: "Everything you need for the company trip — rooms, transport, schedule and more.",
+  // 2. TUKAR IKON BUMI KEPADA LOGO HEXA DI SINI
+  icons: {
+    icon: "https://www.image2url.com/r2/default/images/1782449481103-502f082d-7833-4f62-aa85-949f4ee5409e.png",
+  },
 };
 export const viewport: Viewport = { themeColor: "#0e6e5c", width: "device-width", initialScale: 1 };
 

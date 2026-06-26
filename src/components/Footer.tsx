@@ -13,7 +13,7 @@ export default function Footer() {
           
           {/* Maklumat Hubungi / Kredit */}
           <p className="text-xs md:text-right">
-            Found something off? Contact <span className="font-medium text-ink">Amsha</span>.
+            Found something off? Contact <span className="font-medium text-ink">the organizing committee</span>.
           </p>
         </div>
 

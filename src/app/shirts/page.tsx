@@ -17,7 +17,8 @@ export default async function Page() {
   const [rows, settings, dress] = await Promise.all([getTshirts(), getSettings(), getDressCode()]);
 
   const fallback = [settings.safari_shirt_image, settings.waterworld_shirt_image, settings.gala_image];
-  const cards = dress.map((d, i) => ({ ...d, img: d.image || fallback[i] || "" }));
+  const confirmed = (v: string) => !["false", "no", "0"].includes((v || "").toLowerCase());
+  const cards = dress.map((d, i) => ({ ...d, img: confirmed(d.confirmed) ? (d.image || fallback[i] || "") : "" }));
   const galaPair = [
     { url: settings.gala_management_image, label: "Management" },
     { url: settings.gala_staff_image, label: "Staff" },
@@ -61,6 +62,7 @@ export default async function Page() {
                     <div className="flex flex-1 flex-col p-5">
                       <span className="tag inline-flex w-fit items-center rounded-full bg-amber/15 px-2.5 py-1 text-amber">{c.day}</span>
                       <h3 className="mt-2 font-display text-lg font-semibold">{c.theme}</h3>
+                      {c.teeColour && <p className="tag mt-1 text-muted">Colour: {c.teeColour}</p>}
                       {c.description && <p className="mt-1.5 text-sm leading-relaxed text-muted">{c.description}</p>}
                     </div>
                   </article>

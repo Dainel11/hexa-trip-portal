@@ -8,7 +8,7 @@ export const TABS = {
   eventInfo: "EventInfo", itinerary: "Itinerary", rooms: "Rooms", transport: "Transport",
   tshirts: "TShirts", payments: "Payments", allowance: "Allowance", contacts: "Contacts",
   dressCode: "DressCode", restaurants: "Restaurants", locations: "Locations",
-  dosDonts: "DosDonts", parking: "Parking", settings: "Settings",
+  dosDonts: "DosDonts", parking: "Parking", settings: "Settings", roomTypes: "RoomTypes",
 } as const;
 
 /** Full navigation (Allowance + Contacts removed — info lives on Home/Transport). */
@@ -30,3 +30,24 @@ export const BOTTOM_NAV = [
   { href: "/shirts", label: "Shirts", icon: "shirt" },
   { href: "/locations", label: "Places", icon: "pin" },
 ] as const;
+
+/* ─── Config defaults (overridable from the Settings tab) ─── */
+export const ROOM_TYPE_FALLBACK: Record<string, string> = { FS: "Family Studio", "3R": "3 Bedroom Condo" };
+export const MEAL_ALLOWANCE_DEFAULT = 80;
+export const DRIVER_ALLOWANCE_DEFAULT = 130;
+export const DRIVER_MIN_PAX_DEFAULT = 3;
+
+/** Read a numeric setting with a fallback. */
+export function numSetting(settings: Record<string, string>, key: string, fallback: number): number {
+  const n = Number((settings[key] ?? "").replace(/[^\d.]/g, ""));
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+/** Map a room code/label to its full label via config (accepts code OR full text). */
+export function roomLabel(value: string, roomId: string, map: Record<string, string>): string {
+  const v = (value || "").trim();
+  if (map[v.toUpperCase()]) return map[v.toUpperCase()];          // value is a code
+  if (Object.values(map).some((l) => l.toLowerCase() === v.toLowerCase())) return v; // already full label
+  const code = (roomId || "").trim().split(/\s+/)[0]?.toUpperCase() || "";           // derive from roomId prefix
+  if (map[code]) return map[code];
+  return v;
+}

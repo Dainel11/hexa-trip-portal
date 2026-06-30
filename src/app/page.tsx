@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { getEventInfo, getContacts, getItinerary } from "@/lib/sheets";
-import { NAV } from "@/lib/config";
+import { getEventInfo, getContacts, getItinerary, getSettings } from "@/lib/sheets";
+import { NAV, numSetting, MEAL_ALLOWANCE_DEFAULT } from "@/lib/config";
 import SmartImage from "@/components/SmartImage";
 import Countdown from "@/components/Countdown";
 import { Pill } from "@/components/Card";
 import { phoneDisplay, telHref, groupBy } from "@/lib/format";
-import { PhoneIcon } from "@/components/icons";
+import { PhoneIcon, WalletIcon } from "@/components/icons";
 
 export const revalidate = 60;
 
@@ -15,7 +15,8 @@ function dayKey(d: string): string {
 }
 
 export default async function Home() {
-  const [info, contacts, itinerary] = await Promise.all([getEventInfo(), getContacts(), getItinerary()]);
+  const [info, contacts, itinerary, settings] = await Promise.all([getEventInfo(), getContacts(), getItinerary(), getSettings()]);
+  const meal = numSetting(settings, "meal_allowance_per_pax", MEAL_ALLOWANCE_DEFAULT);
   const dates = [info.startDate, info.endDate].filter(Boolean).join(" – ");
   const quick = NAV.filter((n) => n.href !== "/");
   const emergency = contacts.slice(0, 4);
@@ -51,6 +52,14 @@ export default async function Home() {
 
       <div className="mx-auto max-w-content space-y-10 px-4 py-8">
         {info.startDate && <Countdown date={info.startDate} />}
+
+        <section className="flex items-center gap-4 rounded-2xl border border-line bg-surface p-5">
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-brand-soft text-brand"><WalletIcon className="h-6 w-6" /></span>
+          <div>
+            <p className="tag text-muted">Meal allowance</p>
+            <p className="font-display text-xl font-semibold">{`RM ${meal}`} <span className="text-base font-normal text-muted">per pax</span></p>
+          </div>
+        </section>
 
         {scheduleDay.length > 0 && (
           <section className="rounded-2xl border border-line bg-surface p-5">

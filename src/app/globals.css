@@ -27,7 +27,7 @@
   --water: #5aa6c4;
 }
 
-html { -webkit-text-size-adjust: 100%; font-size: 17px; } /* tune this to scale ALL text bigger/smaller */
+html { -webkit-text-size-adjust: 100%; font-size: 17.5px; } /* tune this to scale ALL text bigger/smaller */
 body {
   background: var(--canvas);
   color: var(--ink);
@@ -45,7 +45,7 @@ body {
 /* Mono field-tag, e.g. ROOM · FS 1 */
 .tag {
   font-family: var(--font-mono), monospace;
-  font-size: 0.7rem;
+  font-size: 0.74rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }

@@ -7,13 +7,6 @@ import { VehicleIcon } from "./icons";
 type Item = Record<string, string>;
 type Variant = "rooms" | "transport" | "tshirt" | "payment";
 
-function statusTone(s: string): "brand" | "amber" | "muted" {
-  const v = s.toLowerCase();
-  if (v.includes("paid")) return "brand";
-  if (v.includes("partial")) return "amber";
-  return "muted";
-}
-
 export default function SearchableList({
   items, fields, placeholder, variant, requireSearch = false,
 }: {
@@ -69,26 +62,19 @@ function RoomsView({ rows }: { rows: Item[] }) {
   const byRoom = groupBy(rows, (r) => r["roomId"]);
   return (
     <div className="grid gap-4 sm:grid-cols-2">
-      {[...byRoom.entries()].map(([room, occ]) => {
-        const leader = occ.find((o) => o["roomLeader"])?.["roomLeader"];
-        return (
-          <div key={room} className="rounded-2xl border border-line bg-surface p-5">
-            <div className="flex items-center justify-between">
-              <Pill tone="brand">Room · {room}</Pill>
-              {occ[0]?.["roomType"] && <span className="tag text-muted">{occ[0]["roomType"]}</span>}
-            </div>
-            {leader && (<p className="mt-3 text-sm"><span className="tag text-amber">Leader</span> <span className="font-medium">{leader}</span></p>)}
-            <ul className="mt-3 space-y-1.5">
-              {occ.map((o, i) => (
-                <li key={i} className="flex items-center justify-between border-t border-line/70 pt-1.5 first:border-0 first:pt-0">
-                  <span className={o["name"] === leader ? "font-medium" : ""}>{o["name"]}</span>
-                  {o["costType"] && <span className="tag text-muted">{o["costType"]}</span>}
-                </li>
-              ))}
-            </ul>
+      {[...byRoom.entries()].map(([room, occ]) => (
+        <div key={room} className="rounded-2xl border border-line bg-surface p-5">
+          <div className="flex items-center justify-between gap-2">
+            <Pill tone="brand">Room · {room}</Pill>
+            {occ[0]?.["roomTypeLabel"] && <span className="text-sm font-medium text-muted">{occ[0]["roomTypeLabel"]}</span>}
           </div>
-        );
-      })}
+          <ul className="mt-3 space-y-1.5">
+            {occ.map((o, i) => (
+              <li key={i} className="border-t border-line/70 pt-1.5 first:border-0 first:pt-0">{o["name"]}</li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </div>
   );
 }
@@ -139,15 +125,16 @@ function PaymentView({ rows }: { rows: Item[] }) {
     <div className="overflow-hidden rounded-2xl border border-line">
       <table className="w-full text-sm">
         <thead className="bg-brand-soft text-left">
-          <tr className="tag text-brand"><th className="px-4 py-3">Family</th><th className="px-4 py-3 text-right">Paid</th><th className="px-4 py-3 text-right">Balance</th><th className="px-4 py-3">Status</th></tr>
+          <tr className="tag text-brand"><th className="px-4 py-3">Staff / Family</th><th className="px-4 py-3 text-center">Pax</th><th className="px-4 py-3 text-right">Amount to pay</th></tr>
         </thead>
         <tbody>
           {rows.map((r, i) => (
-            <tr key={i} className="border-t border-line bg-surface">
-              <td className="px-4 py-3 font-medium">{r["familyGroup"]}</td>
-              <td className="px-4 py-3 text-right">{rm(r["amountPaid"])}</td>
-              <td className="px-4 py-3 text-right">{rm(r["balance"])}</td>
-              <td className="px-4 py-3">{r["status"] && <Pill tone={statusTone(r["status"])}>{r["status"]}</Pill>}</td>
+            <tr key={i} className="border-t border-line bg-surface align-top">
+              <td className="px-4 py-3 font-medium">{r["familyGroup"]}
+                {r["paxAges"] && <span className="mt-0.5 block text-xs font-normal text-muted">Ages: {r["paxAges"]}</span>}
+              </td>
+              <td className="px-4 py-3 text-center">{r["paxCount"] || "—"}</td>
+              <td className="px-4 py-3 text-right font-semibold">{rm(r["amountDue"])}</td>
             </tr>
           ))}
         </tbody>

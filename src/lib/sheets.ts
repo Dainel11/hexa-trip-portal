@@ -13,7 +13,7 @@ import { isBlockedField } from "./privacy";
 import type {
   EventInfo, ItineraryItem, RoomRow, TransportRow, TshirtRow, PaymentRow,
   AllowanceRow, ContactRow, DressCodeRow, RestaurantRow, LocationRow,
-  DosDontsRow, ParkingRow, Row,
+  DosDontsRow, ParkingRow, RoomTypeRow, Row,
 } from "./types";
 
 function headerKey(h: string): string {
@@ -140,6 +140,8 @@ export async function getPayments(): Promise<PaymentRow[]> {
     amountPaid: pick(r, "amount_paid_rm", "amount_paid"),
     balance: pick(r, "balance_rm", "balance"),
     status: pick(r, "status"),
+    paxCount: pick(r, "pax_count", "pax", "no_of_pax"),
+    paxAges: pick(r, "pax_ages", "ages"),
   }));
 }
 
@@ -159,6 +161,8 @@ export async function getDressCode(): Promise<DressCodeRow[]> {
   return (await getRows(TABS.dressCode)).map((r) => ({
     day: pick(r, "day"), theme: pick(r, "theme"),
     description: pick(r, "description", "notes"), image: pick(r, "image"),
+    teeColour: pick(r, "tee_colour", "tee_color", "colour", "color"),
+    confirmed: pick(r, "confirmed"),
   }));
 }
 
@@ -187,4 +191,15 @@ export async function getParking(): Promise<ParkingRow[]> {
     area: pick(r, "area"), capacity: pick(r, "capacity"),
     notes: pick(r, "notes"), mapLink: pick(r, "map_link", "maps"),
   }));
+}
+
+export async function getRoomTypes(): Promise<Record<string, string>> {
+  const { ROOM_TYPE_FALLBACK } = await import("./config");
+  const rows = (await getRows(TABS.roomTypes)).map((r) => ({
+    code: pick(r, "code", "key"), label: pick(r, "label", "name", "value"),
+  } as RoomTypeRow));
+  if (!rows.length) return ROOM_TYPE_FALLBACK;
+  const map: Record<string, string> = {};
+  for (const r of rows) if (r.code) map[r.code.toUpperCase()] = r.label || r.code;
+  return Object.keys(map).length ? map : ROOM_TYPE_FALLBACK;
 }

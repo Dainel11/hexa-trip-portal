@@ -123,19 +123,31 @@ function deriveType(v: string): string {
   return "CAR";
 }
 export async function getTransport(): Promise<TransportRow[]> {
-  return (await getRows(TABS.transport)).map((r) => {
+  const rows = await getRows(TABS.transport);
+  let curId = "", curPlate = "", carSeq = 0;
+  return rows.map((r) => {
     const vehicle = pick(r, "vehicle");
-    const vehicleId = pick(r, "vehicle_id") || vehicle;
     const vehicleType = (pick(r, "vehicle_type") || deriveType(vehicle)).toUpperCase();
-    const driverFlag = pick(r, "is_driver", "driver");
+    const explicitId = pick(r, "vehicle_id");
+    const plate = pick(r, "car_plate", "plate");
+    const name = pick(r, "name_as_listed", "full_name", "name");
+    let vehicleId = "", isDriver = false, rowPlate = "";
+    if (explicitId) {
+      vehicleId = explicitId;
+      isDriver = /^(y|yes|true|1|driver)$/i.test(pick(r, "is_driver", "driver"));
+      rowPlate = plate;
+    } else if (vehicleType === "CAR") {
+      // No vehicle_id given: a plate marks a new car + its driver; blanks ride along.
+      if (plate) { carSeq++; curId = `Car ${carSeq}`; curPlate = plate; isDriver = true; }
+      else if (!curId) { carSeq++; curId = `Car ${carSeq}`; }
+      vehicleId = curId; rowPlate = curPlate;
+    } else {
+      vehicleId = vehicle || vehicleType; rowPlate = "";
+    }
     return {
-      vehicle, vehicleId, vehicleType,
-      plate: pick(r, "car_plate", "plate"),
-      isDriver: /^(y|yes|true|1|driver)$/i.test(driverFlag),
+      vehicle, vehicleId, vehicleType, plate: rowPlate, isDriver,
       pic: pick(r, "pic", "person_in_charge", "incharge"),
-      name: pick(r, "name_as_listed", "full_name", "name"),
-      pickupPoint: pick(r, "pickup_point", "pickup"),
-      pickupTime: pick(r, "pickup_time"),
+      name, pickupPoint: pick(r, "pickup_point", "pickup"), pickupTime: pick(r, "pickup_time"),
     };
   });
 }
@@ -220,12 +232,18 @@ export async function getRoomTypes(): Promise<Record<string, string>> {
 }
 
 export async function getPax(): Promise<PaxRow[]> {
-  return (await getRows(TABS.pax)).map((r) => ({
-    staffName: pick(r, "staff_name", "staff", "name"),
-    paxName: pick(r, "pax_name", "name"),
-    type: pick(r, "type", "category"),
-    age: pick(r, "age"),
-  }));
+  const rows = await getRows(TABS.pax);
+  let lastStaff = "";
+  return rows.map((r) => {
+    const own = pick(r, "staff_name", "staff");
+    if (own) lastStaff = own;
+    return {
+      staffName: own || lastStaff,                 // blank rows belong to the staff above
+      paxName: pick(r, "pax_name", "name"),
+      type: pick(r, "type", "category"),
+      age: pick(r, "age"),
+    };
+  });
 }
 
 export async function getPaymentRules() {

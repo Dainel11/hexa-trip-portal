@@ -28,9 +28,13 @@ export default async function Page() {
         {!rows.length ? (
           <EmptyState title="No transport yet" hint="Fill the Transport tab to populate this list." />
         ) : (
-          <SearchableList items={rows as unknown as Record<string, string>[]}
-            fields={["name", "vehicle", "vehicleId", "plate", "pickupPoint"]}
-            placeholder="Search your name or vehicle (e.g. BUS A)…" variant="transport" driverMinPax={minPax} />
+          <SearchableList
+            items={rows.map((r) => ({
+              name: r.name, vehicleId: r.vehicleId, vehicleType: r.vehicleType,
+              plate: r.plate, isDriver: r.isDriver ? "1" : "", pic: r.pic,
+            }))}
+            fields={["name", "vehicleId", "plate"]}
+            placeholder="Search your name…" variant="transport" driverMinPax={minPax} />
         )}
       </div>
     </>

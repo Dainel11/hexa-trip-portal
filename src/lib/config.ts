@@ -8,7 +8,7 @@ export const TABS = {
   eventInfo: "EventInfo", itinerary: "Itinerary", rooms: "Rooms", transport: "Transport",
   tshirts: "TShirts", payments: "Payments", allowance: "Allowance", contacts: "Contacts",
   dressCode: "DressCode", restaurants: "Restaurants", locations: "Locations",
-  dosDonts: "DosDonts", parking: "Parking", settings: "Settings", roomTypes: "RoomTypes",
+  dosDonts: "DosDonts", parking: "Parking", settings: "Settings", roomTypes: "RoomTypes", pax: "Pax",
 } as const;
 
 /** Full navigation (Allowance + Contacts removed — info lives on Home/Transport). */

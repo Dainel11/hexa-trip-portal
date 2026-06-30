@@ -29,8 +29,8 @@ export default async function Page() {
           <EmptyState title="No transport yet" hint="Fill the Transport tab to populate this list." />
         ) : (
           <SearchableList items={rows as unknown as Record<string, string>[]}
-            fields={["name", "vehicle", "plate", "pickupPoint"]}
-            placeholder="Search your name or vehicle (e.g. BUS A)…" variant="transport" />
+            fields={["name", "vehicle", "vehicleId", "plate", "pickupPoint"]}
+            placeholder="Search your name or vehicle (e.g. BUS A)…" variant="transport" driverMinPax={minPax} />
         )}
       </div>
     </>

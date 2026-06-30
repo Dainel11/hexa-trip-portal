@@ -13,7 +13,7 @@ import { isBlockedField } from "./privacy";
 import type {
   EventInfo, ItineraryItem, RoomRow, TransportRow, TshirtRow, PaymentRow,
   AllowanceRow, ContactRow, DressCodeRow, RestaurantRow, LocationRow,
-  DosDontsRow, ParkingRow, RoomTypeRow, Row,
+  DosDontsRow, ParkingRow, RoomTypeRow, PaxRow, Row,
 } from "./types";
 
 function headerKey(h: string): string {
@@ -116,13 +116,28 @@ export async function getRooms(): Promise<RoomRow[]> {
   }));
 }
 
+function deriveType(v: string): string {
+  const u = v.toUpperCase();
+  if (u.includes("BUS")) return "BUS";
+  if (u.includes("VAN")) return "VAN";
+  return "CAR";
+}
 export async function getTransport(): Promise<TransportRow[]> {
-  return (await getRows(TABS.transport)).map((r) => ({
-    vehicle: pick(r, "vehicle"), plate: pick(r, "car_plate", "plate"),
-    name: pick(r, "name_as_listed", "full_name", "name"),
-    pickupPoint: pick(r, "pickup_point", "pickup"),
-    pickupTime: pick(r, "pickup_time"),
-  }));
+  return (await getRows(TABS.transport)).map((r) => {
+    const vehicle = pick(r, "vehicle");
+    const vehicleId = pick(r, "vehicle_id") || vehicle;
+    const vehicleType = (pick(r, "vehicle_type") || deriveType(vehicle)).toUpperCase();
+    const driverFlag = pick(r, "is_driver", "driver");
+    return {
+      vehicle, vehicleId, vehicleType,
+      plate: pick(r, "car_plate", "plate"),
+      isDriver: /^(y|yes|true|1|driver)$/i.test(driverFlag),
+      pic: pick(r, "pic", "person_in_charge", "incharge"),
+      name: pick(r, "name_as_listed", "full_name", "name"),
+      pickupPoint: pick(r, "pickup_point", "pickup"),
+      pickupTime: pick(r, "pickup_time"),
+    };
+  });
 }
 
 export async function getTshirts(): Promise<TshirtRow[]> {
@@ -202,4 +217,30 @@ export async function getRoomTypes(): Promise<Record<string, string>> {
   const map: Record<string, string> = {};
   for (const r of rows) if (r.code) map[r.code.toUpperCase()] = r.label || r.code;
   return Object.keys(map).length ? map : ROOM_TYPE_FALLBACK;
+}
+
+export async function getPax(): Promise<PaxRow[]> {
+  return (await getRows(TABS.pax)).map((r) => ({
+    staffName: pick(r, "staff_name", "staff", "name"),
+    paxName: pick(r, "pax_name", "name"),
+    type: pick(r, "type", "category"),
+    age: pick(r, "age"),
+  }));
+}
+
+export async function getPaymentRules() {
+  const { DEFAULT_RULES } = await import("./payment");
+  const s = await getSettings();
+  const n = (k: string, d: number) => {
+    const v = Number((s[k] ?? "").replace(/[^\d.]/g, ""));
+    return Number.isFinite(v) && (s[k] ?? "") !== "" ? v : d;
+  };
+  return {
+    staff: n("pay_staff", DEFAULT_RULES.staff),
+    adultGuest: [n("pay_adult_1", DEFAULT_RULES.adultGuest[0]), n("pay_adult_2plus", DEFAULT_RULES.adultGuest[1])],
+    child: n("pay_child", DEFAULT_RULES.child),
+    infant: n("pay_infant", DEFAULT_RULES.infant),
+    infantMaxAge: n("pay_infant_max_age", DEFAULT_RULES.infantMaxAge),
+    childMaxAge: n("pay_child_max_age", DEFAULT_RULES.childMaxAge),
+  };
 }

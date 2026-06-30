@@ -67,3 +67,10 @@ body {
   a[href]::after { content: ""; }
   @page { margin: 16mm; }
 }
+
+/* "YOU" highlight glow for searched user (subtle, runs twice) */
+@keyframes glowYou {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(14,110,92,0); }
+  50%      { box-shadow: 0 0 0 3px rgba(14,110,92,0.28); }
+}
+.glow-you { animation: glowYou 1.8s ease-in-out 2; }

@@ -1,0 +1,5 @@
+ROOM LEADER:
+Add a column named "room_leader" to your existing Rooms tab.
+Fill in the leader's name on the first row of each room (the room head row).
+The portal automatically picks it up and highlights that person.
+No other change is needed.

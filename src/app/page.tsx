@@ -6,7 +6,7 @@ import Countdown from "@/components/Countdown";
 import GlobalSearch from "@/components/GlobalSearch";
 import { Pill } from "@/components/Card";
 import { phoneDisplay, telHref, groupBy, rm } from "@/lib/format";
-import { PhoneIcon, CarIcon, WalletIcon } from "@/components/icons";
+import { PhoneIcon } from "@/components/icons";
 
 export const revalidate = 60;
 
@@ -59,14 +59,14 @@ export default async function Home() {
         {info.startDate && <Countdown date={info.startDate} />}
 
         <section className="grid gap-4 sm:grid-cols-2">
-          <div className="flex flex-col items-center rounded-2xl border border-line bg-surface p-6 text-center">
-            <span className="grid h-12 w-12 place-items-center rounded-xl bg-brand-soft text-brand"><WalletIcon className="h-6 w-6" /></span>
+          <div className="flex flex-col items-center rounded-2xl border border-amber/40 bg-amber/10 p-6 text-center">
+            <span role="img" aria-label="food" className="grid h-12 w-12 place-items-center rounded-xl bg-amber/20 text-2xl">🍱</span>
             <p className="tag mt-3 text-muted">Food allowance</p>
             <p className="font-display text-2xl font-bold">{`RM ${meal}`}</p>
             <p className="mt-1 text-sm text-muted">per pax</p>
           </div>
-          <div className="flex flex-col items-center rounded-2xl border border-line bg-surface p-6 text-center">
-            <span className="grid h-12 w-12 place-items-center rounded-xl bg-brand-soft text-brand"><CarIcon className="h-6 w-6" /></span>
+          <div className="flex flex-col items-center rounded-2xl border-2 border-brand/40 bg-surface p-6 text-center">
+            <span role="img" aria-label="car" className="grid h-12 w-12 place-items-center rounded-xl bg-brand-soft text-2xl">🚗</span>
             <p className="tag mt-3 text-muted">Car allowance</p>
             <p className="font-display text-2xl font-bold">{rm(driverAmount)}</p>
             <p className="mt-1 text-sm text-muted">per qualifying car ({driverMin}+ incl. driver)</p>

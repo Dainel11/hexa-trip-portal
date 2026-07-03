@@ -4,19 +4,20 @@ import PageHeader from "@/components/PageHeader";
 import SearchableList from "@/components/SearchableList";
 import EmptyState from "@/components/EmptyState";
 import { rm } from "@/lib/format";
-import { CarIcon } from "@/components/icons";
 
 export const revalidate = 60;
 export const metadata = { title: "Transport" };
 
-function Metric({ emoji, label, stats, motion }: { emoji: string; label: string; stats: [string, number][]; motion: "drive" | "car" | "none" }) {
+function Metric({ emoji, label, stats, motion }: { emoji: string; label: string; stats: [string, number][]; motion: "bus" | "van" | "car" }) {
   return (
-    <div className={`flex flex-col items-center rounded-2xl border border-line bg-surface p-6 text-center ${motion === "car" ? "speed-lane group cursor-pointer overflow-hidden" : ""}`}>
-      <div className="flex h-14 w-full items-end justify-center">
-        <span role="img" aria-label={label}
-          className={`text-5xl leading-none ${motion === "drive" ? "animate-drive-loop" : motion === "car" ? "speed-car" : ""}`}>{emoji}</span>
+    <div className={`flex flex-col items-center rounded-2xl border border-line bg-surface p-6 text-center ${motion === "car" ? "speed-lane group cursor-pointer" : ""}`}>
+      <div className="road-strip flex h-16 w-full items-center justify-center">
+        <span aria-hidden className="road-edge top" />
+        <span aria-hidden className={`road-lane ${motion === "bus" ? "scroll" : ""}`} />
+        <span aria-hidden className="road-edge bottom" />
+        <span role="img" aria-label={label} style={{ imageRendering: "pixelated" }}
+          className={`relative z-10 text-4xl leading-none drop-shadow-md ${motion === "van" ? "animate-van" : motion === "car" ? "speed-car" : ""}`}>{emoji}</span>
       </div>
-      {motion === "drive" && <div aria-hidden className="mt-1 h-0 w-3/5 border-t-2 border-dashed border-line/70" />}
       <p className="mt-3 font-display text-lg font-semibold">{label}</p>
       <div className="mt-2 flex justify-center gap-6">
         {stats.map(([k, v]) => (
@@ -50,8 +51,8 @@ export default async function Page() {
 
   const summary = (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-      <Metric emoji="🚌" label="Buses" motion="drive" stats={[["Buses", count("BUS")], ["Passengers", pax("BUS")]]} />
-      <Metric emoji="🚐" label="Vans" motion="drive" stats={[["Vans", count("VAN")], ["Passengers", pax("VAN")]]} />
+      <Metric emoji="🚌" label="Buses" motion="bus" stats={[["Buses", count("BUS")], ["Passengers", pax("BUS")]]} />
+      <Metric emoji="🚐" label="Vans" motion="van" stats={[["Vans", count("VAN")], ["Passengers", pax("VAN")]]} />
       <Metric emoji="🚗" label="Cars" motion="car" stats={[["Cars", count("CAR")]]} />
     </div>
   );
@@ -63,11 +64,11 @@ export default async function Page() {
       <div className="mx-auto max-w-content px-4 py-8">
         <div className="mb-6 rounded-2xl bg-brand p-5 text-center text-white shadow-sm" role="alert">
           <p className="flex items-center justify-center gap-2 font-display text-lg font-bold sm:text-xl">
-            <CarIcon className="h-6 w-6" aria-hidden /> Driver allowance — {rm(amount)}
+            <span role="img" aria-label="cash" className="text-2xl">💵</span> Driver allowance — {rm(amount)}
           </p>
           {parkingNote && (
             <p className="mx-auto mt-2 flex max-w-xl items-start justify-center gap-2 text-sm leading-relaxed text-white/90">
-              <span aria-hidden className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded bg-white/20 text-xs font-bold">P</span>
+              <span role="img" aria-label="parking" className="shrink-0 text-lg leading-none">🅿️</span>
               <span>{parkingNote}</span>
             </p>
           )}

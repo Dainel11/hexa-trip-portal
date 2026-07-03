@@ -60,20 +60,12 @@ export default async function Page() {
       <PageHeader eyebrow="03 · Getting there" title="Transport"
         intro="Search your name to find your bus, van or car." />
       <div className="mx-auto max-w-content px-4 py-8">
-        <div className="mb-6 flex items-start gap-3 rounded-2xl border border-amber/30 bg-amber/10 p-4">
-          <span aria-hidden className="text-xl">🚗</span>
-          <p className="text-sm">
-            <span className="font-semibold">Driver allowance — {rm(amount)}.</span>{" "}
-            For a car carrying <span className="font-medium">{minPax} or more people</span> (including the driver).
-          </p>
+        <div className="mb-6 rounded-2xl bg-brand p-5 text-center text-white shadow-sm" role="alert">
+          <p className="font-display text-lg font-bold sm:text-xl">Driver allowance — {rm(amount)}</p>
+          {parkingNote && (
+            <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-white/90">{parkingNote}</p>
+          )}
         </div>
-
-        {parkingNote && (
-          <div className="mb-6 flex items-start gap-3 rounded-2xl border border-line bg-surface p-4">
-            <span aria-hidden className="text-xl">🅿️</span>
-            <p className="text-sm text-muted">{parkingNote}</p>
-          </div>
-        )}
 
         {!safeRows.length ? (
           <EmptyState title="No transport yet" hint="Fill the Employees tab (vehicle_id) to populate this list." />

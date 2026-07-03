@@ -24,7 +24,11 @@ export default function GlobalSearch({ entries }: { entries: DirectoryEntry[] })
   const results = useMemo(() => {
     if (!term) return [];
     return entries
-      .filter((e) => e.name.toLowerCase().includes(term) || e.aliases.some((a) => a.toLowerCase().includes(term)))
+      .filter((e) =>
+        e.name.toLowerCase().includes(term) ||
+        e.aliases.some((a) => a.toLowerCase().includes(term)) ||
+        e.family.some((f) => f.name.toLowerCase().includes(term)),
+      )
       .slice(0, 8);
   }, [term, entries]);
 
@@ -54,7 +58,12 @@ export default function GlobalSearch({ entries }: { entries: DirectoryEntry[] })
                 className="flex w-full items-center justify-between gap-2 px-4 py-3 text-left transition hover:bg-brand-soft/40 focus-visible:bg-brand-soft/40 focus-visible:outline-none">
                 <span className="min-w-0">
                   <span className="block truncate font-medium">{e.name}</span>
-                  <span className="tag text-muted">{[e.roomId, e.vehicleId].filter(Boolean).join(" · ") || "—"}</span>
+                  <span className="tag block truncate text-muted">
+                    {[e.roomId, e.vehicleId, e.size ? `Size ${e.size}` : ""].filter(Boolean).join(" · ") || "—"}
+                  </span>
+                  {e.family.length > 0 && (
+                    <span className="tag block truncate text-muted/80">+{e.family.length} family: {e.family.map((f) => f.name).join(", ")}</span>
+                  )}
                 </span>
                 {e.isLeader && <span className="shrink-0 rounded-full bg-amber/15 px-2 py-0.5 text-[10px] font-bold uppercase text-amber">★ Leader</span>}
               </button>

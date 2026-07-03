@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { getEventInfo, getContacts, getItinerary, getSettings, getCarAllowances, getDirectory } from "@/lib/sheets";
-import { NAV, numSetting, DRIVER_ALLOWANCE_DEFAULT, DRIVER_MIN_PAX_DEFAULT } from "@/lib/config";
+import { getEventInfo, getContacts, getItinerary, getSettings, getDirectory } from "@/lib/sheets";
+import { NAV, numSetting, MEAL_ALLOWANCE_DEFAULT, DRIVER_ALLOWANCE_DEFAULT, DRIVER_MIN_PAX_DEFAULT } from "@/lib/config";
 import SmartImage from "@/components/SmartImage";
 import Countdown from "@/components/Countdown";
 import GlobalSearch from "@/components/GlobalSearch";
 import { Pill } from "@/components/Card";
 import { phoneDisplay, telHref, groupBy, rm } from "@/lib/format";
-import { PhoneIcon, CarIcon } from "@/components/icons";
+import { PhoneIcon, CarIcon, WalletIcon } from "@/components/icons";
 
 export const revalidate = 60;
 
@@ -17,10 +17,9 @@ function dayKey(d: string): string {
 
 export default async function Home() {
   const [info, contacts, itinerary, settings, directory] = await Promise.all([getEventInfo(), getContacts(), getItinerary(), getSettings(), getDirectory()]);
+  const meal = numSetting(settings, "meal_allowance_per_pax", MEAL_ALLOWANCE_DEFAULT);
   const driverMin = numSetting(settings, "driver_min_pax", DRIVER_MIN_PAX_DEFAULT);
   const driverAmount = numSetting(settings, "driver_allowance_amount", DRIVER_ALLOWANCE_DEFAULT);
-  const allow = await getCarAllowances(driverMin);
-  const eligibleCars = [...allow.values()].filter((a) => a.eligible).length;
   const dates = [info.startDate, info.endDate].filter(Boolean).join(" – ");
   const quick = NAV.filter((n) => n.href !== "/");
   const emergency = contacts.slice(0, 4);
@@ -61,14 +60,16 @@ export default async function Home() {
 
         <section className="grid gap-4 sm:grid-cols-2">
           <div className="flex flex-col items-center rounded-2xl border border-line bg-surface p-6 text-center">
+            <span className="grid h-12 w-12 place-items-center rounded-xl bg-brand-soft text-brand"><WalletIcon className="h-6 w-6" /></span>
+            <p className="tag mt-3 text-muted">Food allowance</p>
+            <p className="font-display text-2xl font-bold">{`RM ${meal}`}</p>
+            <p className="mt-1 text-sm text-muted">per pax</p>
+          </div>
+          <div className="flex flex-col items-center rounded-2xl border border-line bg-surface p-6 text-center">
             <span className="grid h-12 w-12 place-items-center rounded-xl bg-brand-soft text-brand"><CarIcon className="h-6 w-6" /></span>
             <p className="tag mt-3 text-muted">Car allowance</p>
             <p className="font-display text-2xl font-bold">{rm(driverAmount)}</p>
-            <p className="mt-1 text-sm text-muted">per qualifying car ({driverMin}+ people incl. driver)</p>
-          </div>
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-line bg-surface p-6 text-center">
-            <p className="font-display text-4xl font-bold text-brand">{eligibleCars}</p>
-            <p className="mt-1 tag text-muted">cars currently qualify</p>
+            <p className="mt-1 text-sm text-muted">per qualifying car ({driverMin}+ incl. driver)</p>
           </div>
         </section>
 

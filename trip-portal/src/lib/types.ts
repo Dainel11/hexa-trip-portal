@@ -34,17 +34,19 @@ export interface EmployeeRow {
   empId: string; name: string; phone: string; location: string; vegetarian: string;
   isManagement: boolean; tshirtSize: string; roomId: string; vehicleId: string;
   isDriver: boolean; carPlate: string; emergencyName: string; emergencyPhone: string;
-  relationship: string; notes: string; isLeader: boolean; active: boolean;
+  relationship: string; notes: string; isLeader: boolean; active: boolean; age: string;
 }
 export interface FamilyRow {
   memberId: string; empId: string; name: string; age: string; tshirtSize: string; vegetarian: string; relationship: string;
 }
 export interface VehicleRow { vehicleId: string; type: string; plate: string; driverOrPic: string; }
 
-export interface DirectoryFamily { name: string; relationship: string; size: string; }
+export interface DirectoryFamily { name: string; relationship: string; size: string; age: string; }
 export interface DirectoryEntry {
   name: string; empId: string;
   roomId: string; roomLabel: string; roomLeader: string; isLeader: boolean;
   vehicleId: string; vehicleType: string; plate: string; isDriver: boolean;
-  size: string; family: DirectoryFamily[]; aliases: string[];
+  size: string; age: string; vegetarian: string;
+  emergencyName: string; emergencyPhone: string; emergencyRelationship: string;
+  family: DirectoryFamily[]; aliases: string[];
 }

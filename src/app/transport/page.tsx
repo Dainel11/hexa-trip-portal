@@ -61,9 +61,14 @@ export default async function Page() {
         intro="Search your name to find your bus, van or car." />
       <div className="mx-auto max-w-content px-4 py-8">
         <div className="mb-6 rounded-2xl bg-brand p-5 text-center text-white shadow-sm" role="alert">
-          <p className="font-display text-lg font-bold sm:text-xl">Driver allowance — {rm(amount)}</p>
+          <p className="flex items-center justify-center gap-2 font-display text-lg font-bold sm:text-xl">
+            <CarIcon className="h-6 w-6" aria-hidden /> Driver allowance — {rm(amount)}
+          </p>
           {parkingNote && (
-            <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-white/90">{parkingNote}</p>
+            <p className="mx-auto mt-2 flex max-w-xl items-start justify-center gap-2 text-sm leading-relaxed text-white/90">
+              <span aria-hidden className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded bg-white/20 text-xs font-bold">P</span>
+              <span>{parkingNote}</span>
+            </p>
           )}
         </div>
 

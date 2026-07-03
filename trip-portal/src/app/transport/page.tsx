@@ -60,20 +60,17 @@ export default async function Page() {
       <PageHeader eyebrow="03 · Getting there" title="Transport"
         intro="Search your name to find your bus, van or car." />
       <div className="mx-auto max-w-content px-4 py-8">
-        <div className="mb-6 flex items-start gap-3 rounded-2xl border border-amber/30 bg-amber/10 p-4">
-          <span aria-hidden className="text-xl">🚗</span>
-          <p className="text-sm">
-            <span className="font-semibold">Driver allowance — {rm(amount)}.</span>{" "}
-            For a car carrying <span className="font-medium">{minPax} or more people</span> (including the driver).
+        <div className="mb-6 rounded-2xl bg-brand p-5 text-center text-white shadow-sm" role="alert">
+          <p className="flex items-center justify-center gap-2 font-display text-lg font-bold sm:text-xl">
+            <CarIcon className="h-6 w-6" aria-hidden /> Driver allowance — {rm(amount)}
           </p>
+          {parkingNote && (
+            <p className="mx-auto mt-2 flex max-w-xl items-start justify-center gap-2 text-sm leading-relaxed text-white/90">
+              <span aria-hidden className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded bg-white/20 text-xs font-bold">P</span>
+              <span>{parkingNote}</span>
+            </p>
+          )}
         </div>
-
-        {parkingNote && (
-          <div className="mb-6 flex items-start gap-3 rounded-2xl border border-line bg-surface p-4">
-            <span aria-hidden className="text-xl">🅿️</span>
-            <p className="text-sm text-muted">{parkingNote}</p>
-          </div>
-        )}
 
         {!safeRows.length ? (
           <EmptyState title="No transport yet" hint="Fill the Employees tab (vehicle_id) to populate this list." />

@@ -75,6 +75,23 @@ const isActive = (v: string) => {
   const t = (v || "").trim().toLowerCase();
   return t === "" ? true : /^(true|yes|1|checked|ya|x|✓)$/.test(t);
 };
+const EVENT_YEAR = 2026;
+/** Derive age from a 12-digit Malaysian MyKad (YYMMDD…). Passports/short IDs → "" (unknown).
+ *  IC itself is NEVER returned to the client; only the derived age is exposed. */
+function ageFromIC(ic: string): string {
+  const raw = (ic || "").trim();
+  if (/[A-Za-z]/.test(raw)) return "";           // passport, not a MyKad
+  const d = raw.replace(/\D/g, "");
+  if (d.length !== 12) return "";
+  const yy = parseInt(d.slice(0, 2), 10);
+  const mm = parseInt(d.slice(2, 4), 10);
+  if (Number.isNaN(yy) || mm < 1 || mm > 12) return "";
+  const pivot = EVENT_YEAR % 100;
+  const year = yy <= pivot ? 2000 + yy : 1900 + yy;
+  const age = EVENT_YEAR - year;
+  return age >= 0 && age < 120 ? String(age) : "";
+}
+
 function deriveType(v: string): string {
   const u = (v || "").toUpperCase();
   if (u.includes("BUS")) return "BUS";
@@ -85,25 +102,38 @@ function deriveType(v: string): string {
 // ── Normalised source getters ────────────────────────────────────────────────
 
 export async function getEmployees(): Promise<EmployeeRow[]> {
-  return (await getRows(TABS.employees)).map((r) => ({
-    empId: pick(r, "emp_id", "id"),
-    name: pick(r, "name", "full_name", "employee_name"),
-    phone: pick(r, "phone", "phone_number"),
-    location: pick(r, "location"),
-    vegetarian: pick(r, "vegetarian"),
-    isManagement: yes(pick(r, "is_management", "management")),
-    tshirtSize: pick(r, "tshirt_size", "size", "shirt_size"),
-    roomId: pick(r, "room_id", "room"),
-    vehicleId: pick(r, "vehicle_id", "vehicle"),
-    isDriver: yes(pick(r, "is_driver", "driver")),
-    carPlate: pick(r, "car_plate", "plate"),
-    emergencyName: pick(r, "emergency_name"),
-    emergencyPhone: pick(r, "emergency_phone"),
-    relationship: pick(r, "relationship", "relation"),
-    notes: pick(r, "notes"),
-    isLeader: yes(pick(r, "is_leader", "leader", "room_leader")),
-    active: isActive(pick(r, "status", "active", "joining")),
-  })).filter((e) => e.name);
+  const grid = await fetchTab(TABS.employees);
+  if (grid.length < 2) return [];
+  const headers = grid[0].map(headerKey);
+  const get = (cells: string[], ...keys: string[]) => {
+    for (const k of keys) { const i = headers.indexOf(k); if (i >= 0 && (cells[i] ?? "").trim()) return cells[i].trim(); }
+    return "";
+  };
+  return grid.slice(1).flatMap((cells) => {
+    const name = get(cells, "name", "full_name", "employee_name");
+    if (!name) return [];
+    const ic = get(cells, "ic_passport", "ic", "passport", "ic_number"); // read transiently for age only
+    return [{
+      empId: get(cells, "emp_id", "id"),
+      name,
+      phone: get(cells, "phone", "phone_number"),
+      location: get(cells, "location"),
+      vegetarian: get(cells, "vegetarian"),
+      isManagement: yes(get(cells, "is_management", "management")),
+      tshirtSize: get(cells, "tshirt_size", "shirt_size"),
+      roomId: get(cells, "room_id", "room"),
+      vehicleId: get(cells, "vehicle_id", "vehicle"),
+      isDriver: yes(get(cells, "is_driver", "driver")),
+      carPlate: get(cells, "car_plate", "plate"),
+      emergencyName: get(cells, "emergency_name"),
+      emergencyPhone: get(cells, "emergency_phone"),
+      relationship: get(cells, "relationship", "relation"),
+      notes: get(cells, "notes"),
+      isLeader: yes(get(cells, "is_leader", "leader", "room_leader")),
+      active: isActive(get(cells, "status", "active", "joining")),
+      age: ageFromIC(ic), // IC is not stored/returned — only the derived age
+    }];
+  });
 }
 
 export async function getFamily(): Promise<FamilyRow[]> {
@@ -306,25 +336,23 @@ export async function getCarAllowances(minPax: number): Promise<Map<string, { el
   const vType = new Map(vehicles.map((v) => [v.vehicleId.toUpperCase(), (v.type || "").toUpperCase()]));
   const famByEmp = new Map<string, number>();
   for (const f of fam) if (byId.get(f.empId)) famByEmp.set(f.empId, (famByEmp.get(f.empId) || 0) + 1);
-  const occ = new Map<string, number>();
-  const driverOf = new Map<string, { name: string; empId: string }>();
-  for (const e of active) if (e.vehicleId) {
-    occ.set(e.vehicleId, (occ.get(e.vehicleId) || 0) + 1);
-    if (e.isDriver) driverOf.set(e.vehicleId, { name: e.name, empId: e.empId });
-  }
-  for (const f of fam) { const e = byId.get(f.empId); if (e?.vehicleId) occ.set(e.vehicleId, (occ.get(e.vehicleId) || 0) + 1); }
+  const empsByVeh = new Map<string, EmployeeRow[]>();
+  for (const e of active) if (e.vehicleId) { const l = empsByVeh.get(e.vehicleId) ?? []; l.push(e); empsByVeh.set(e.vehicleId, l); }
+  const famByVeh = new Map<string, number>();
+  for (const f of fam) { const e = byId.get(f.empId); if (e?.vehicleId) famByVeh.set(e.vehicleId, (famByVeh.get(e.vehicleId) || 0) + 1); }
   const out = new Map<string, { eligible: boolean; driver: string; occupants: number }>();
-  for (const [vid, count] of occ) {
+  for (const [vid, emps] of empsByVeh) {
     const type = vType.get(vid.toUpperCase()) || deriveType(vid);
-    const drv = driverOf.get(vid);
-    if (type !== "CAR" || !drv) { out.set(vid, { eligible: false, driver: drv?.name || "", occupants: count }); continue; }
-    const broughtFamily = (famByEmp.get(drv.empId) || 0) > 0;
-    out.set(vid, { eligible: broughtFamily || count >= minPax, driver: drv.name, occupants: count });
+    const driver = emps.find((e) => e.isDriver) ?? emps[0]; // fall back to first employee if is_driver not set
+    const occupants = emps.length + (famByVeh.get(vid) || 0);
+    const driverBroughtFamily = driver ? (famByEmp.get(driver.empId) || 0) > 0 : false;
+    // Rule [C]: a car driver auto-qualifies if they brought their own family, OR the car carries minPax total.
+    const eligible = type === "CAR" && !!driver && (driverBroughtFamily || occupants >= minPax);
+    out.set(vid, { eligible, driver: driver?.name || "", occupants });
   }
   return out;
 }
 
-/** Flat searchable directory for the homepage global search (one record per active employee). */
 export async function getDirectory(): Promise<DirectoryEntry[]> {
   const [{ active, fam, byId }, vehicles, roomTypes] = await Promise.all([activeRoster(), getVehicles(), getRoomTypes()]);
   const vMap = new Map(vehicles.map((v) => [v.vehicleId.toUpperCase(), v]));
@@ -338,7 +366,7 @@ export async function getDirectory(): Promise<DirectoryEntry[]> {
   return active.map((e) => {
     const v = e.vehicleId ? vMap.get(e.vehicleId.toUpperCase()) : undefined;
     const type = (v?.type || (e.vehicleId ? deriveType(e.vehicleId) : "")).toUpperCase();
-    const family = (famByEmp.get(e.empId) || []).map((f) => ({ name: f.name, relationship: f.relationship || "", size: f.tshirtSize || "" }));
+    const family = (famByEmp.get(e.empId) || []).map((f) => ({ name: f.name, relationship: f.relationship || "", size: f.tshirtSize || "", age: f.age || "" }));
     return {
       name: e.name, empId: e.empId,
       roomId: e.roomId, roomLabel: labelOf(e.roomId),
@@ -346,6 +374,9 @@ export async function getDirectory(): Promise<DirectoryEntry[]> {
       vehicleId: e.vehicleId, vehicleType: type,
       plate: e.vehicleId && type === "CAR" ? (v?.plate || e.vehicleId) : "",
       isDriver: e.isDriver, size: e.tshirtSize || "",
+      age: e.age || "",
+      vegetarian: /^(y|yes|true|1)$/i.test(e.vegetarian) ? "Vegetarian" : "Non-Vegetarian",
+      emergencyName: e.emergencyName || "", emergencyPhone: e.emergencyPhone || "", emergencyRelationship: e.relationship || "",
       family, aliases: family.map((f) => f.name),
     };
   });

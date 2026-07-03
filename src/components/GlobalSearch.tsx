@@ -80,6 +80,9 @@ export default function GlobalSearch({ entries }: { entries: DirectoryEntry[] })
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h3 className="font-display text-xl font-semibold tracking-tight">{sel.name}</h3>
+                <p className="mt-0.5 text-sm text-muted">
+                  {sel.age ? `${sel.age} yrs` : "Age —"} · {sel.vegetarian}
+                </p>
                 {sel.isLeader && <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber/15 px-2 py-0.5 text-[11px] font-bold uppercase text-amber">★ Room Leader</span>}
               </div>
               <button onClick={() => setSel(null)} aria-label="Close"
@@ -102,13 +105,27 @@ export default function GlobalSearch({ entries }: { entries: DirectoryEntry[] })
                 {sel.size ? `Size ${sel.size}` : "Size TBC"}
               </Field>
 
+              <Field label="Dietary preference">{sel.vegetarian}</Field>
+
+              {(sel.emergencyPhone || sel.emergencyName) && (
+                <Field label="Emergency contact">
+                  {sel.emergencyPhone || "—"}
+                  {(sel.emergencyName || sel.emergencyRelationship) && (
+                    <span className="mt-0.5 block text-xs font-normal text-muted">
+                      {sel.emergencyName}{sel.emergencyRelationship ? ` (${sel.emergencyRelationship})` : ""}
+                    </span>
+                  )}
+                </Field>
+              )}
+
               <Field label={`Family (${sel.family.length})`} href="/shirts">
                 {sel.family.length
                   ? <ul className="space-y-0.5 font-normal">
                       {sel.family.map((f, i) => (
                         <li key={i} className="text-sm">
                           {f.relationship && <span className="tag text-muted">{f.relationship} </span>}
-                          {f.name}{f.size ? <span className="text-muted"> · {f.size}</span> : ""}
+                          {f.name}
+                          <span className="text-muted">{f.age ? ` · ${f.age}y` : ""}{f.size ? ` · ${f.size}` : ""}</span>
                         </li>
                       ))}
                     </ul>

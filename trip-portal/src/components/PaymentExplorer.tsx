@@ -113,10 +113,10 @@ function BankCard({ bank }: { bank?: BankInfo }) {
           {bank.reference && (<div><dt className="tag text-muted">Payment reference</dt><dd className="font-medium">{bank.reference}</dd></div>)}
         </dl>
         {bank.qrUrl && (
-          <figure className="mx-auto w-full max-w-[220px]">
-            <div className="aspect-square overflow-hidden rounded-xl border border-line bg-white p-2">
+          <figure className="mx-auto w-full max-w-[300px]">
+            <div className="mx-auto aspect-square w-full overflow-hidden rounded-xl border border-line bg-white p-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={bank.qrUrl} alt="DuitNow QR code" width={220} height={220} loading="lazy" className="h-full w-full object-contain" />
+              <img src={bank.qrUrl} alt="DuitNow QR code" width={300} height={300} loading="lazy" className="h-full w-full object-contain" />
             </div>
             <figcaption className="tag mt-2 text-center text-muted">Scan with any banking app</figcaption>
           </figure>

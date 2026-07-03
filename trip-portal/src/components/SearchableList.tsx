@@ -127,7 +127,10 @@ function RoomsView({ groups, term }: { groups: [string, Item[]][]; term: string 
           <div key={room} className={`rounded-2xl border bg-surface p-5 transition ${hasYou ? "glow-you border-brand" : "border-line"}`}>
             <div className="flex items-center justify-between gap-2">
               <Pill tone="brand">Room · {room}</Pill>
-              {occ[0]?.["roomTypeLabel"] && <span className="text-sm font-medium uppercase text-muted">{occ[0]["roomTypeLabel"]}</span>}
+              <span className="flex items-center gap-2">
+                {occ[0]?.["roomTypeLabel"] && <span className="text-sm font-medium uppercase text-muted">{occ[0]["roomTypeLabel"]}</span>}
+                <span className="rounded-full bg-brand-soft px-2.5 py-0.5 text-xs font-bold text-brand">{occ.length} Pax</span>
+              </span>
             </div>
             {leader && (
               <p className="mt-3 flex flex-wrap items-center gap-2 border-b border-line/70 pb-2.5">
@@ -224,10 +227,10 @@ function TransportView({ groups, term, minPax }: { groups: [string, Item[]][]; t
             )}
             {!isCar && pic && <p className="mt-2 text-sm text-muted"><span className="tag">PIC</span> {pic}</p>}
 
-            <ul className="mt-3 grid grid-cols-1 gap-1 sm:grid-cols-2">
+            <ul className="mt-3 space-y-1.5">
               {ppl.filter((p) => p !== driver).map((p, i) => {
                 const you = isMatch(p["name"], term);
-                return <li key={i} className={`flex items-center gap-2 text-sm ${you ? "font-bold text-brand" : ""}`}>{p["name"]}{you && <YouBadge />}</li>;
+                return <li key={i} className={`flex items-center gap-2 border-t border-line/70 pt-1.5 text-sm first:border-0 first:pt-0 ${you ? "font-bold text-brand" : ""}`}><span aria-hidden className="text-muted">·</span>{p["name"]}{you && <YouBadge />}</li>;
               })}
             </ul>
           </div>
@@ -238,8 +241,9 @@ function TransportView({ groups, term, minPax }: { groups: [string, Item[]][]; t
 }
 
 function sizeOrBlank(v: string): string {
+  // ROSTER_SYSTEM stores curated sizes: letters (S–7XL) AND valid kids' numeric sizes (22–34).
   const t = (v || "").trim();
-  return /^\d+$/.test(t) ? "" : t; // a pure number is a mis-entered age, not a size
+  return t; // trust the sheet; only truly empty is blank
 }
 
 function TshirtView({ rows }: { rows: Item[] }) {

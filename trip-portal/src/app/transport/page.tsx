@@ -1,4 +1,4 @@
-import { getTransport, getSettings } from "@/lib/sheets";
+import { getTransport, getSettings, getCarAllowances } from "@/lib/sheets";
 import { numSetting, DRIVER_ALLOWANCE_DEFAULT, DRIVER_MIN_PAX_DEFAULT } from "@/lib/config";
 import PageHeader from "@/components/PageHeader";
 import SearchableList from "@/components/SearchableList";
@@ -30,6 +30,7 @@ export default async function Page() {
   const [rows, settings] = await Promise.all([getTransport(), getSettings()]);
   const amount = numSetting(settings, "driver_allowance_amount", DRIVER_ALLOWANCE_DEFAULT);
   const minPax = numSetting(settings, "driver_min_pax", DRIVER_MIN_PAX_DEFAULT);
+  const allow = await getCarAllowances(minPax);
   const parkingNote = settings.parking_note || "";
   const safeRows = rows || [];
 
@@ -81,6 +82,7 @@ export default async function Page() {
             items={safeRows.map((r) => ({
               name: r.name, vehicleId: r.vehicleId, vehicleType: r.vehicleType,
               plate: r.plate, isDriver: r.isDriver ? "1" : "", pic: r.pic,
+              eligible: allow.get(r.vehicleId)?.eligible ? "1" : "",
             }))}
             fields={["name", "vehicleId", "plate"]}
             placeholder="Search your name…" variant="transport" driverMinPax={minPax}

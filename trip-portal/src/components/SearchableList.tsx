@@ -203,8 +203,8 @@ function TransportView({ groups, term, minPax }: { groups: [string, Item[]][]; t
         const driver = ppl.find((p) => p["isDriver"] === "1");
         const plate = ppl.find((p) => p["plate"])?.["plate"];
         const pic = ppl.find((p) => p["pic"])?.["pic"];
-        // Driver allowance: CAR only, and the car must carry minPax people total (incl. the driver).
-        const eligible = type === "CAR" && ppl.length >= minPax;
+        // Eligibility is computed server-side (rule C: brought family OR car carries minPax incl. driver).
+        const eligible = ppl.some((p) => p["eligible"] === "1");
         const hasYou = ppl.some((p) => isMatch(p["name"], term));
         return (
           <div key={veh} className={`rounded-2xl border bg-surface p-5 transition ${hasYou ? "glow-you border-brand" : "border-line"}`}>

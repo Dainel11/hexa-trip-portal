@@ -40,3 +40,11 @@ export interface FamilyRow {
   memberId: string; empId: string; name: string; age: string; tshirtSize: string; vegetarian: string; relationship: string;
 }
 export interface VehicleRow { vehicleId: string; type: string; plate: string; driverOrPic: string; }
+
+export interface DirectoryFamily { name: string; relationship: string; size: string; }
+export interface DirectoryEntry {
+  name: string; empId: string;
+  roomId: string; roomLabel: string; roomLeader: string; isLeader: boolean;
+  vehicleId: string; vehicleType: string; plate: string; isDriver: boolean;
+  size: string; family: DirectoryFamily[]; aliases: string[];
+}

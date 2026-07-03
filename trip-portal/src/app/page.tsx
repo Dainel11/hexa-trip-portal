@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { getEventInfo, getContacts, getItinerary, getSettings, getTransport } from "@/lib/sheets";
+import { getEventInfo, getContacts, getItinerary, getSettings, getCarAllowances, getDirectory } from "@/lib/sheets";
 import { NAV, numSetting, DRIVER_ALLOWANCE_DEFAULT, DRIVER_MIN_PAX_DEFAULT } from "@/lib/config";
 import SmartImage from "@/components/SmartImage";
 import Countdown from "@/components/Countdown";
+import GlobalSearch from "@/components/GlobalSearch";
 import { Pill } from "@/components/Card";
 import { phoneDisplay, telHref, groupBy, rm } from "@/lib/format";
 import { PhoneIcon, CarIcon } from "@/components/icons";
@@ -15,13 +16,11 @@ function dayKey(d: string): string {
 }
 
 export default async function Home() {
-  const [info, contacts, itinerary, settings, transport] = await Promise.all([getEventInfo(), getContacts(), getItinerary(), getSettings(), getTransport()]);
-  const driverAmount = numSetting(settings, "driver_allowance_amount", DRIVER_ALLOWANCE_DEFAULT);
+  const [info, contacts, itinerary, settings, directory] = await Promise.all([getEventInfo(), getContacts(), getItinerary(), getSettings(), getDirectory()]);
   const driverMin = numSetting(settings, "driver_min_pax", DRIVER_MIN_PAX_DEFAULT);
-  // Cars that qualify for the driver allowance (CAR carrying >= driver_min_pax incl. driver).
-  const carPax = new Map<string, number>();
-  for (const r of transport || []) if ((r.vehicleType || "").toUpperCase() === "CAR") carPax.set(r.vehicleId, (carPax.get(r.vehicleId) || 0) + 1);
-  const eligibleCars = [...carPax.values()].filter((n) => n >= driverMin).length;
+  const driverAmount = numSetting(settings, "driver_allowance_amount", DRIVER_ALLOWANCE_DEFAULT);
+  const allow = await getCarAllowances(driverMin);
+  const eligibleCars = [...allow.values()].filter((a) => a.eligible).length;
   const dates = [info.startDate, info.endDate].filter(Boolean).join(" – ");
   const quick = NAV.filter((n) => n.href !== "/");
   const emergency = contacts.slice(0, 4);
@@ -56,6 +55,8 @@ export default async function Home() {
       </section>
 
       <div className="mx-auto max-w-content space-y-10 px-4 py-8">
+        <GlobalSearch entries={directory} />
+
         {info.startDate && <Countdown date={info.startDate} />}
 
         <section className="grid gap-4 sm:grid-cols-2">

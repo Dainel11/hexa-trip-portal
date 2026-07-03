@@ -19,7 +19,7 @@ import { isBlockedField } from "./privacy";
 import type {
   EventInfo, ItineraryItem, RoomRow, TransportRow, TshirtRow, PaymentRow,
   AllowanceRow, ContactRow, DressCodeRow, RestaurantRow, LocationRow,
-  DosDontsRow, ParkingRow, PaxRow, Row, EmployeeRow, FamilyRow, VehicleRow,
+  DosDontsRow, ParkingRow, PaxRow, Row, EmployeeRow, FamilyRow, VehicleRow, DirectoryEntry,
 } from "./types";
 
 function headerKey(h: string): string {
@@ -293,6 +293,62 @@ export async function getRoomTypes(): Promise<Record<string, string>> {
   const map: Record<string, string> = {};
   for (const r of rows) if (r.code) map[r.code.toUpperCase()] = r.label || r.code;
   return Object.keys(map).length ? map : ROOM_TYPE_FALLBACK;
+}
+
+/**
+ * Driver (car) allowance eligibility — rule [C]:
+ *  A car driver qualifies if they bring their own official family member,
+ *  OR the car carries at least `minPax` people total (including the driver).
+ * Returns vehicle_id → { eligible, driver, occupants }.
+ */
+export async function getCarAllowances(minPax: number): Promise<Map<string, { eligible: boolean; driver: string; occupants: number }>> {
+  const [{ active, fam, byId }, vehicles] = await Promise.all([activeRoster(), getVehicles()]);
+  const vType = new Map(vehicles.map((v) => [v.vehicleId.toUpperCase(), (v.type || "").toUpperCase()]));
+  const famByEmp = new Map<string, number>();
+  for (const f of fam) if (byId.get(f.empId)) famByEmp.set(f.empId, (famByEmp.get(f.empId) || 0) + 1);
+  const occ = new Map<string, number>();
+  const driverOf = new Map<string, { name: string; empId: string }>();
+  for (const e of active) if (e.vehicleId) {
+    occ.set(e.vehicleId, (occ.get(e.vehicleId) || 0) + 1);
+    if (e.isDriver) driverOf.set(e.vehicleId, { name: e.name, empId: e.empId });
+  }
+  for (const f of fam) { const e = byId.get(f.empId); if (e?.vehicleId) occ.set(e.vehicleId, (occ.get(e.vehicleId) || 0) + 1); }
+  const out = new Map<string, { eligible: boolean; driver: string; occupants: number }>();
+  for (const [vid, count] of occ) {
+    const type = vType.get(vid.toUpperCase()) || deriveType(vid);
+    const drv = driverOf.get(vid);
+    if (type !== "CAR" || !drv) { out.set(vid, { eligible: false, driver: drv?.name || "", occupants: count }); continue; }
+    const broughtFamily = (famByEmp.get(drv.empId) || 0) > 0;
+    out.set(vid, { eligible: broughtFamily || count >= minPax, driver: drv.name, occupants: count });
+  }
+  return out;
+}
+
+/** Flat searchable directory for the homepage global search (one record per active employee). */
+export async function getDirectory(): Promise<DirectoryEntry[]> {
+  const [{ active, fam, byId }, vehicles, roomTypes] = await Promise.all([activeRoster(), getVehicles(), getRoomTypes()]);
+  const vMap = new Map(vehicles.map((v) => [v.vehicleId.toUpperCase(), v]));
+  const empsByRoom = new Map<string, EmployeeRow[]>();
+  for (const e of active) if (e.roomId) { const l = empsByRoom.get(e.roomId) ?? []; l.push(e); empsByRoom.set(e.roomId, l); }
+  const leaderOf = new Map<string, string>();
+  for (const [rid, list] of empsByRoom) leaderOf.set(rid, (list.find((e) => e.isLeader) ?? list[0])?.name ?? "");
+  const famByEmp = new Map<string, FamilyRow[]>();
+  for (const f of fam) if (byId.get(f.empId)) { const l = famByEmp.get(f.empId) ?? []; l.push(f); famByEmp.set(f.empId, l); }
+  const labelOf = (rid: string) => roomTypes[(rid.split(/[\s-]/)[0] || "").toUpperCase()] || "";
+  return active.map((e) => {
+    const v = e.vehicleId ? vMap.get(e.vehicleId.toUpperCase()) : undefined;
+    const type = (v?.type || (e.vehicleId ? deriveType(e.vehicleId) : "")).toUpperCase();
+    const family = (famByEmp.get(e.empId) || []).map((f) => ({ name: f.name, relationship: f.relationship || "", size: f.tshirtSize || "" }));
+    return {
+      name: e.name, empId: e.empId,
+      roomId: e.roomId, roomLabel: labelOf(e.roomId),
+      roomLeader: leaderOf.get(e.roomId) || "", isLeader: (leaderOf.get(e.roomId) || "") === e.name,
+      vehicleId: e.vehicleId, vehicleType: type,
+      plate: e.vehicleId && type === "CAR" ? (v?.plate || e.vehicleId) : "",
+      isDriver: e.isDriver, size: e.tshirtSize || "",
+      family, aliases: family.map((f) => f.name),
+    };
+  });
 }
 
 // Legacy tabs no longer exist in ROSTER_SYSTEM — return empty (nothing reads them).

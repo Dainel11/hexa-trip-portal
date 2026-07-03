@@ -17,7 +17,7 @@ export interface ItineraryItem {
 }
 export interface RoomRow { roomId: string; roomType: string; roomLeader: string; name: string; costType: string; }
 export interface TransportRow { vehicle: string; vehicleId: string; vehicleType: string; plate: string; isDriver: boolean; pic: string; name: string; pickupPoint: string; pickupTime: string; }
-export interface TshirtRow { name: string; safariSize: string; waterworldSize: string; }
+export interface TshirtRow { name: string; safariSize: string; waterworldSize: string; staff?: string; relationship?: string; size?: string; }
 export interface PaymentRow { familyGroup: string; amountDue: string; amountPaid: string; balance: string; status: string; paxCount: string; paxAges: string; }
 export interface AllowanceRow { item: string; amount: string; notes: string; }
 export interface ContactRow { name: string; role: string; phone: string; }
@@ -34,9 +34,9 @@ export interface EmployeeRow {
   empId: string; name: string; phone: string; location: string; vegetarian: string;
   isManagement: boolean; tshirtSize: string; roomId: string; vehicleId: string;
   isDriver: boolean; carPlate: string; emergencyName: string; emergencyPhone: string;
-  relationship: string; notes: string; active: boolean;
+  relationship: string; notes: string; isLeader: boolean; active: boolean;
 }
 export interface FamilyRow {
-  memberId: string; empId: string; name: string; age: string; tshirtSize: string; vegetarian: string;
+  memberId: string; empId: string; name: string; age: string; tshirtSize: string; vegetarian: string; relationship: string;
 }
 export interface VehicleRow { vehicleId: string; type: string; plate: string; driverOrPic: string; }

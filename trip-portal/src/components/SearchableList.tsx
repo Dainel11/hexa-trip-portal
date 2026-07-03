@@ -5,7 +5,7 @@ import { groupBy, rm } from "@/lib/format";
 import { VehicleIcon } from "./icons";
 
 type Item = Record<string, string>;
-type Variant = "rooms" | "transport" | "tshirt" | "payment";
+type Variant = "rooms" | "transport" | "tshirt" | "payment" | "shirtFamily";
 
 /** Highlight only on a full match: the whole name, or a complete word in it.
  *  So "amsha" highlights AMSHA …, but "am" does not light up everyone. */
@@ -18,21 +18,26 @@ function isMatch(name: string, term: string): boolean {
 function YouBadge() {
   return <span className="rounded-full bg-brand px-2 py-0.5 text-[10px] font-bold tracking-wide text-white">YOU</span>;
 }
+function LeaderBadge() {
+  return <span className="inline-flex items-center gap-1 rounded-full bg-amber/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber">★ Room Leader</span>;
+}
 
 export default function SearchableList({
-  items, fields, placeholder, variant, requireSearch = false, driverMinPax = 3,
+  items, fields, placeholder, variant, requireSearch = false, driverMinPax = 3, banners,
 }: {
   items: Item[]; fields: string[]; placeholder: string; variant: Variant;
   requireSearch?: boolean; driverMinPax?: number;
+  banners?: { src: string; label: string }[];
 }) {
   const [q, setQ] = useState("");
   const term = q.trim().toLowerCase();
   const searching = term.length > 0;
-  const groupVariant = variant === "rooms" || variant === "transport";
-  const needSearch = requireSearch || groupVariant; // rooms & transport are search-driven
-  const keyOf = (it: Item) => (variant === "rooms" ? it["roomId"] : it["vehicleId"] || it["vehicle"]) || "—";
+  const groupVariant = variant === "rooms" || variant === "transport" || variant === "shirtFamily";
+  const needSearch = requireSearch || groupVariant; // rooms, transport & family are search-driven
+  const keyOf = (it: Item) =>
+    (variant === "rooms" ? it["roomId"] : variant === "shirtFamily" ? it["staff"] : it["vehicleId"] || it["vehicle"]) || "—";
 
-  // For group variants: show the WHOLE room/vehicle that contains a match.
+  // For group variants: show the WHOLE room/vehicle/family that contains a match.
   const groups = useMemo(() => {
     if (!groupVariant || !searching) return [];
     const all = groupBy(items, keyOf);
@@ -56,11 +61,27 @@ export default function SearchableList({
         <div className="relative">
           <span aria-hidden className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted">⌕</span>
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={placeholder}
-            className="w-full rounded-full border border-line bg-surface py-3 pl-10 pr-4 text-base outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/30"
-            aria-label={placeholder} />
+            className="min-h-[44px] w-full rounded-full border border-line bg-surface py-3 pl-10 pr-4 text-base outline-none transition focus-visible:border-brand focus-visible:ring-2 focus-visible:ring-brand/40"
+            aria-label={placeholder} type="search" enterKeyHint="search" />
         </div>
-        {showResults && <p className="mt-1.5 pl-2 text-xs text-muted">{count} {groupVariant ? (count === 1 ? "match" : "matches") : (count === 1 ? "result" : "results")}{q && ` for “${q}”`}</p>}
+        {showResults && <p className="mt-1.5 pl-2 text-xs text-muted" aria-live="polite">{count} {groupVariant ? (count === 1 ? "match" : "matches") : (count === 1 ? "result" : "results")}{q && ` for “${q}”`}</p>}
       </div>
+
+      {banners && banners.length > 0 && (
+        <div aria-hidden={searching}
+          className={`grid grid-cols-1 gap-4 overflow-hidden transition-all duration-300 ease-in-out motion-reduce:transition-none sm:grid-cols-2 ${searching ? "mb-0 max-h-0 opacity-0" : "mb-6 max-h-[440px] opacity-100"}`}>
+          {banners.map((b) => (
+            <figure key={b.label} className="overflow-hidden rounded-2xl border border-line bg-surface">
+              <div className="flex aspect-[16/9] items-center justify-center bg-gradient-to-b from-brand-soft/30 to-surface p-3">
+                {b.src
+                  ? <img src={b.src} alt={b.label} loading="lazy" className="h-full w-full object-contain" />
+                  : <span className="tag text-muted">Image coming soon</span>}
+              </div>
+              <figcaption className="tag px-4 py-2 text-center font-medium uppercase text-muted">{b.label}</figcaption>
+            </figure>
+          ))}
+        </div>
+      )}
 
       {!showResults ? (
         <div className="rounded-2xl border border-dashed border-line bg-surface/40 p-8 text-center">
@@ -73,6 +94,8 @@ export default function SearchableList({
         <RoomsView groups={groups} term={term} />
       ) : variant === "transport" ? (
         <TransportView groups={groups} term={term} minPax={driverMinPax} />
+      ) : variant === "shirtFamily" ? (
+        <ShirtFamilyView groups={groups} term={term} />
       ) : variant === "tshirt" ? (
         <TshirtView rows={rows} />
       ) : (
@@ -87,14 +110,24 @@ function RoomsView({ groups, term }: { groups: [string, Item[]][]; term: string 
     <div className="grid gap-4 sm:grid-cols-2">
       {groups.map(([room, occ]) => {
         const hasYou = occ.some((o) => isMatch(o["name"], term));
+        const leaderName = occ[0]?.["roomLeader"] || "";
+        const leader = leaderName ? occ.find((o) => o["name"] === leaderName) : undefined;
+        const members = occ.filter((o) => o !== leader);
         return (
           <div key={room} className={`rounded-2xl border bg-surface p-5 transition ${hasYou ? "glow-you border-brand" : "border-line"}`}>
             <div className="flex items-center justify-between gap-2">
               <Pill tone="brand">Room · {room}</Pill>
               {occ[0]?.["roomTypeLabel"] && <span className="text-sm font-medium uppercase text-muted">{occ[0]["roomTypeLabel"]}</span>}
             </div>
+            {leader && (
+              <p className="mt-3 flex flex-wrap items-center gap-2 border-b border-line/70 pb-2.5">
+                <LeaderBadge />
+                <span className={isMatch(leader["name"], term) ? "font-bold text-brand" : "font-semibold"}>{leader["name"]}</span>
+                {isMatch(leader["name"], term) && <YouBadge />}
+              </p>
+            )}
             <ul className="mt-3 space-y-1.5">
-              {occ.map((o, i) => {
+              {members.map((o, i) => {
                 const you = isMatch(o["name"], term);
                 return (
                   <li key={i} className={`flex items-center gap-2 border-t border-line/70 pt-1.5 first:border-0 first:pt-0 ${you ? "font-bold text-brand" : ""}`}>
@@ -103,6 +136,47 @@ function RoomsView({ groups, term }: { groups: [string, Item[]][]; term: string 
                 );
               })}
             </ul>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function ShirtFamilyView({ groups, term }: { groups: [string, Item[]][]; term: string }) {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2">
+      {groups.map(([staff, ppl]) => {
+        const hasYou = ppl.some((p) => isMatch(p["name"], term));
+        const owner = ppl.find((p) => !(p["relationship"] || "")) ?? ppl[0];
+        const family = ppl.filter((p) => p !== owner);
+        const sizeOf = (p: Item) => sizeOrBlank(p["size"] || p["safariSize"]);
+        return (
+          <div key={staff} className={`rounded-2xl border bg-surface p-5 transition ${hasYou ? "glow-you border-brand" : "border-line"}`}>
+            <div className="flex items-center justify-between gap-2">
+              <Pill tone="brand">Family</Pill>
+              <span className="tag text-muted">{ppl.length} {ppl.length === 1 ? "person" : "people"}</span>
+            </div>
+            <p className="mt-3 flex flex-wrap items-center gap-2 border-b border-line/70 pb-2.5">
+              <span className={isMatch(owner["name"], term) ? "font-bold text-brand" : "font-semibold"}>{owner["name"]}</span>
+              {isMatch(owner["name"], term) && <YouBadge />}
+              <span className="ml-auto">{sizeOf(owner) ? <Pill tone="amber">{sizeOf(owner)}</Pill> : <span className="tag text-muted">size TBC</span>}</span>
+            </p>
+            {family.length > 0 && (
+              <ul className="mt-3 space-y-1.5">
+                {family.map((f, i) => {
+                  const you = isMatch(f["name"], term);
+                  const sz = sizeOf(f);
+                  return (
+                    <li key={i} className={`flex items-center gap-2 text-sm ${you ? "font-bold text-brand" : ""}`}>
+                      {f["relationship"] && <span className="tag text-muted">{f["relationship"]}</span>}
+                      <span>{f["name"]}</span>{you && <YouBadge />}
+                      <span className="ml-auto">{sz ? <Pill tone="water">{sz}</Pill> : <span className="tag text-muted">TBC</span>}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </div>
         );
       })}

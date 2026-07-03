@@ -101,6 +101,7 @@ export async function getEmployees(): Promise<EmployeeRow[]> {
     emergencyPhone: pick(r, "emergency_phone"),
     relationship: pick(r, "relationship", "relation"),
     notes: pick(r, "notes"),
+    isLeader: yes(pick(r, "is_leader", "leader", "room_leader")),
     active: isActive(pick(r, "status", "active", "joining")),
   })).filter((e) => e.name);
 }
@@ -113,6 +114,7 @@ export async function getFamily(): Promise<FamilyRow[]> {
     age: pick(r, "age"),
     tshirtSize: pick(r, "tshirt_size", "size"),
     vegetarian: pick(r, "vegetarian"),
+    relationship: pick(r, "relationship", "relation"),
   })).filter((f) => f.name && f.empId);
 }
 
@@ -176,12 +178,20 @@ export async function getItinerary(): Promise<ItineraryItem[]> {
 /** Rooms derived: each active employee + their family, grouped by room_id. */
 export async function getRooms(): Promise<RoomRow[]> {
   const { active, fam, byId } = await activeRoster();
+  // Designate one leader per room: the employee flagged is_leader, else the first employee.
+  const empsByRoom = new Map<string, EmployeeRow[]>();
+  for (const e of active) if (e.roomId) {
+    const list = empsByRoom.get(e.roomId) ?? [];
+    list.push(e); empsByRoom.set(e.roomId, list);
+  }
+  const leaderOf = new Map<string, string>();
+  for (const [rid, list] of empsByRoom) leaderOf.set(rid, (list.find((e) => e.isLeader) ?? list[0])?.name ?? "");
   const out: RoomRow[] = [];
   for (const e of active)
-    if (e.roomId) out.push({ roomId: e.roomId, roomType: "", roomLeader: e.name, name: e.name, costType: "" });
+    if (e.roomId) out.push({ roomId: e.roomId, roomType: "", roomLeader: leaderOf.get(e.roomId) || "", name: e.name, costType: "" });
   for (const f of fam) {
     const e = byId.get(f.empId);
-    if (e?.roomId) out.push({ roomId: e.roomId, roomType: "", roomLeader: e.name, name: f.name, costType: "" });
+    if (e?.roomId) out.push({ roomId: e.roomId, roomType: "", roomLeader: leaderOf.get(e.roomId) || "", name: f.name, costType: "" });
   }
   return out;
 }
@@ -210,8 +220,12 @@ export async function getTransport(): Promise<TransportRow[]> {
 export async function getTshirts(): Promise<TshirtRow[]> {
   const { active, fam, byId } = await activeRoster();
   const out: TshirtRow[] = [];
-  for (const e of active) out.push({ name: e.name, safariSize: e.tshirtSize, waterworldSize: e.tshirtSize });
-  for (const f of fam) if (byId.get(f.empId)) out.push({ name: f.name, safariSize: f.tshirtSize, waterworldSize: f.tshirtSize });
+  for (const e of active)
+    out.push({ name: e.name, staff: e.name, relationship: "", size: e.tshirtSize, safariSize: e.tshirtSize, waterworldSize: e.tshirtSize });
+  for (const f of fam) {
+    const e = byId.get(f.empId);
+    if (e) out.push({ name: f.name, staff: e.name, relationship: f.relationship || "", size: f.tshirtSize, safariSize: f.tshirtSize, waterworldSize: f.tshirtSize });
+  }
   return out;
 }
 

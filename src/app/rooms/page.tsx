@@ -1,4 +1,4 @@
-import { getRooms, getRoomTypes } from "@/lib/sheets";
+import { getRooms, getRoomTypes, getSettings } from "@/lib/sheets";
 import { roomLabel } from "@/lib/config";
 import PageHeader from "@/components/PageHeader";
 import SearchableList from "@/components/SearchableList";
@@ -8,7 +8,7 @@ export const revalidate = 60;
 export const metadata = { title: "Room List" };
 
 export default async function Page() {
-  const [rooms, roomTypes] = await Promise.all([getRooms(), getRoomTypes()]);
+  const [rooms, roomTypes, settings] = await Promise.all([getRooms(), getRoomTypes(), getSettings()]);
   if (!rooms.length)
     return (<><PageHeader eyebrow="02 · Stay" title="Room List" />
       <div className="mx-auto max-w-content px-4 py-8"><EmptyState title="No rooms yet" hint="Fill the Rooms tab to populate this list." /></div></>);
@@ -26,6 +26,10 @@ export default async function Page() {
           fields={["name", "roomId", "roomTypeLabel"]}
           placeholder="Search your name or room (e.g. FS 1)…"
           variant="rooms"
+          banners={[
+            { src: settings.room_fs_image || "", label: "Family Studio" },
+            { src: settings.room_3r_image || "", label: "3 Bedroom Condo" },
+          ]}
         />
       </div>
     </>

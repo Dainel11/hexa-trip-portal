@@ -19,9 +19,10 @@ export default async function Page() {
   const fallback = [settings.safari_shirt_image, settings.waterworld_shirt_image, settings.gala_image];
   const confirmed = (v: string) => !["false", "no", "0"].includes((v || "").toLowerCase());
   const cards = dress.map((d, i) => ({ ...d, img: confirmed(d.confirmed) ? (d.image || fallback[i] || "") : "" }));
+  // Neutral gala inspirations (no Staff/Management split); images come from Config.
   const galaPair = [
-    { url: settings.gala_management_image, label: "Management" },
-    { url: settings.gala_staff_image, label: "Staff" },
+    { url: settings.gala_image_a || settings.gala_management_image, label: "Inspiration A" },
+    { url: settings.gala_image_b || settings.gala_staff_image, label: "Inspiration B" },
   ].filter((g) => g.url);
 
   return (
@@ -42,7 +43,7 @@ export default async function Page() {
                       <div className="grid h-72 grid-cols-2 gap-1 bg-gradient-to-b from-brand-soft/30 to-surface p-2">
                         {galaPair.map((g) => (
                           <figure key={g.label} className="flex min-h-0 flex-col">
-                            <SmartImage src={g.url} alt={g.label} className="min-h-0 w-full flex-1 rounded-lg object-cover" />
+                            <SmartImage src={g.url} alt={g.label} className="min-h-0 w-full flex-1 rounded-lg object-contain" />
                             <figcaption className="tag pt-1 text-center text-muted">{g.label}</figcaption>
                           </figure>
                         ))}
@@ -77,8 +78,8 @@ export default async function Page() {
           <p className="mt-1 text-sm text-muted">Taip nama anda untuk lihat saiz.</p>
           <div className="mt-4">
             {!rows.length ? <EmptyState title="No sizes yet" hint="Fill the TShirts tab." /> : (
-              <SearchableList items={rows as unknown as Record<string, string>[]} fields={["name"]}
-                placeholder="Search your name…" variant="tshirt" requireSearch />
+              <SearchableList items={rows as unknown as Record<string, string>[]} fields={["name", "staff"]}
+                placeholder="Search any name — see the whole family's sizes…" variant="shirtFamily" />
             )}
           </div>
         </section>

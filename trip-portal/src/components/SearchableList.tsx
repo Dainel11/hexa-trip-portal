@@ -19,7 +19,7 @@ function YouBadge() {
   return <span className="rounded-full bg-brand px-2 py-0.5 text-[10px] font-bold tracking-wide text-white">YOU</span>;
 }
 function LeaderBadge() {
-  return <span className="inline-flex items-center gap-1 rounded-full bg-amber/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber">★ Room Leader</span>;
+  return <span className="inline-flex items-center gap-1 rounded-full bg-amber/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber"><span className="star-glow" role="img" aria-label="star">🌟</span> Room Leader</span>;
 }
 
 export default function SearchableList({
@@ -222,7 +222,7 @@ function TransportView({ groups, term, minPax }: { groups: [string, Item[]][]; t
               <p className="mt-3 text-sm"><span className="tag text-amber">Driver</span>{" "}
                 <span className={isMatch(driver["name"], term) ? "font-bold text-brand" : "font-medium"}>{driver["name"]}</span>
                 {isMatch(driver["name"], term) && <> <YouBadge /></>}
-                {eligible && <span className="ml-2 rounded-full bg-brand-soft px-2 py-0.5 tag text-brand">Allowance eligible</span>}
+                {eligible && <span className="badge-glow ml-2 rounded-full bg-brand-soft px-2 py-0.5 tag text-brand">Allowance eligible</span>}
               </p>
             )}
             {!isCar && pic && <p className="mt-2 text-sm text-muted"><span className="tag">PIC</span> {pic}</p>}

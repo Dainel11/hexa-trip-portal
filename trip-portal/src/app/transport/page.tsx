@@ -4,15 +4,19 @@ import PageHeader from "@/components/PageHeader";
 import SearchableList from "@/components/SearchableList";
 import EmptyState from "@/components/EmptyState";
 import { rm } from "@/lib/format";
-import { BusIcon, VanIcon, CarIcon } from "@/components/icons";
+import { CarIcon } from "@/components/icons";
 
 export const revalidate = 60;
 export const metadata = { title: "Transport" };
 
-function Metric({ icon, label, stats }: { icon: React.ReactNode; label: string; stats: [string, number][] }) {
+function Metric({ emoji, label, stats, motion }: { emoji: string; label: string; stats: [string, number][]; motion: "drive" | "car" | "none" }) {
   return (
-    <div className="flex flex-col items-center rounded-2xl border border-line bg-surface p-6 text-center">
-      <span className="grid h-14 w-14 place-items-center rounded-2xl bg-water/15 text-water">{icon}</span>
+    <div className={`flex flex-col items-center rounded-2xl border border-line bg-surface p-6 text-center ${motion === "car" ? "speed-lane group cursor-pointer overflow-hidden" : ""}`}>
+      <div className="flex h-14 w-full items-end justify-center">
+        <span role="img" aria-label={label}
+          className={`text-5xl leading-none ${motion === "drive" ? "animate-drive-loop" : motion === "car" ? "speed-car" : ""}`}>{emoji}</span>
+      </div>
+      {motion === "drive" && <div aria-hidden className="mt-1 h-0 w-3/5 border-t-2 border-dashed border-line/70" />}
       <p className="mt-3 font-display text-lg font-semibold">{label}</p>
       <div className="mt-2 flex justify-center gap-6">
         {stats.map(([k, v]) => (
@@ -46,12 +50,9 @@ export default async function Page() {
 
   const summary = (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-      <Metric icon={<BusIcon className="h-8 w-8" />} label="Buses"
-        stats={[["Buses", count("BUS")], ["Passengers", pax("BUS")]]} />
-      <Metric icon={<VanIcon className="h-8 w-8" />} label="Vans"
-        stats={[["Vans", count("VAN")], ["Passengers", pax("VAN")]]} />
-      <Metric icon={<CarIcon className="h-8 w-8" />} label="Cars"
-        stats={[["Cars", count("CAR")]]} />
+      <Metric emoji="🚌" label="Buses" motion="drive" stats={[["Buses", count("BUS")], ["Passengers", pax("BUS")]]} />
+      <Metric emoji="🚐" label="Vans" motion="drive" stats={[["Vans", count("VAN")], ["Passengers", pax("VAN")]]} />
+      <Metric emoji="🚗" label="Cars" motion="car" stats={[["Cars", count("CAR")]]} />
     </div>
   );
 

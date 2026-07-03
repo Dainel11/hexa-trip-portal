@@ -65,7 +65,7 @@ export default function GlobalSearch({ entries }: { entries: DirectoryEntry[] })
                     <span className="tag block truncate text-muted/80">+{e.family.length} family: {e.family.map((f) => f.name).join(", ")}</span>
                   )}
                 </span>
-                {e.isLeader && <span className="shrink-0 rounded-full bg-amber/15 px-2 py-0.5 text-[10px] font-bold uppercase text-amber">★ Leader</span>}
+                {e.isLeader && <span className="shrink-0 rounded-full bg-amber/15 px-2 py-0.5 text-[10px] font-bold uppercase text-amber"><span className="star-glow" role="img" aria-label="star">🌟</span> Leader</span>}
               </button>
             )) : <p className="px-4 py-6 text-center text-sm text-muted">No one found for “{q}”.</p>}
           </div>
@@ -75,7 +75,7 @@ export default function GlobalSearch({ entries }: { entries: DirectoryEntry[] })
       {sel && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/50 p-0 backdrop-blur-sm sm:items-center sm:p-4"
           role="dialog" aria-modal="true" aria-label={`Details for ${sel.name}`} onClick={() => setSel(null)}>
-          <div className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-t-3xl border border-line bg-canvas p-6 text-left shadow-2xl sm:rounded-3xl"
+          <div className="animate-modal-in max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-t-3xl border border-line bg-canvas p-6 text-left shadow-2xl sm:rounded-3xl"
             onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -83,7 +83,7 @@ export default function GlobalSearch({ entries }: { entries: DirectoryEntry[] })
                 <p className="mt-0.5 text-sm text-muted">
                   {sel.age ? `${sel.age} yrs` : "Age —"} · {sel.vegetarian}
                 </p>
-                {sel.isLeader && <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber/15 px-2 py-0.5 text-[11px] font-bold uppercase text-amber">★ Room Leader</span>}
+                {sel.isLeader && <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber/15 px-2 py-0.5 text-[11px] font-bold uppercase text-amber"><span className="star-glow" role="img" aria-label="star">🌟</span> Room Leader</span>}
               </div>
               <button onClick={() => setSel(null)} aria-label="Close"
                 className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-line text-lg leading-none hover:bg-surface focus-visible:ring-2 focus-visible:ring-brand/40">×</button>

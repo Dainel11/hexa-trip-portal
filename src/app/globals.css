@@ -57,6 +57,42 @@ body {
 @media (prefers-reduced-motion: no-preference) {
   .reveal { animation: rise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
   @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* Bus/Van: gentle "cruising down the highway" oscillation (GPU-accelerated) */
+  .animate-drive-loop { animation: driveLoop 2.4s ease-in-out infinite; will-change: transform; }
+  @keyframes driveLoop {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    25%      { transform: translate3d(4px, -1px, 0); }
+    50%      { transform: translate3d(7px, 0, 0); }
+    75%      { transform: translate3d(4px, -1px, 0); }
+  }
+
+  /* Car: "speed past" on hover/tap, then resets to origin */
+  .speed-lane:hover .speed-car,
+  .speed-lane:active .speed-car { animation: speedPast 0.7s cubic-bezier(0.5, 0, 0.75, 0) 1; }
+  @keyframes speedPast {
+    0%   { transform: translate3d(0, 0, 0); opacity: 1; }
+    55%  { opacity: 1; }
+    100% { transform: translate3d(180%, 0, 0); opacity: 0; }
+  }
+
+  /* Modal: lightweight fade-in + scale-up */
+  .animate-modal-in { animation: modalIn 0.3s ease-out both; will-change: transform, opacity; }
+  @keyframes modalIn { from { opacity: 0; transform: scale(0.96) translateY(6px); } to { opacity: 1; transform: none; } }
+
+  /* Allowance badge: soft high-trust pulsing glow */
+  .badge-glow { animation: badgeGlow 2s ease-in-out infinite; will-change: box-shadow; }
+  @keyframes badgeGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(14, 110, 92, 0); }
+    50%      { box-shadow: 0 0 10px 1px rgba(14, 110, 92, 0.38); }
+  }
+
+  /* Room leader star: vibrant glow */
+  .star-glow { display: inline-block; animation: starGlow 2.2s ease-in-out infinite; will-change: transform, filter; }
+  @keyframes starGlow {
+    0%, 100% { filter: drop-shadow(0 0 1px rgba(245, 180, 60, 0.5)); transform: scale(1); }
+    50%      { filter: drop-shadow(0 0 5px rgba(245, 180, 60, 0.95)); transform: scale(1.12); }
+  }
 }
 
 /* ── Print: itinerary only, clean A4 ── */

@@ -1,4 +1,4 @@
-import { getPax, getPaymentRules } from "@/lib/sheets";
+import { getPax, getPaymentRules, getSettings } from "@/lib/sheets";
 import { computeBreakdown } from "@/lib/payment";
 import { groupBy } from "@/lib/format";
 import { SHOW_PAYMENTS } from "@/lib/config";
@@ -9,16 +9,25 @@ export const revalidate = 60;
 export const metadata = { title: "Payment" };
 
 export default async function Page() {
-  const rules = await getPaymentRules();
+  const [rules, settings] = await Promise.all([getPaymentRules(), getSettings()]);
+  const bank = {
+    bankName: settings.bank_name || "",
+    accountName: settings.account_name || settings.bank_account_name || "",
+    accountNumber: settings.account_number || settings.bank_account_no || "",
+    qrUrl: settings.duitnow_qr || settings.bank_qr_url || "",
+    reference: settings.payment_reference || "",
+  };
+
   if (!SHOW_PAYMENTS)
     return (<><PageHeader eyebrow="06 · Money" title="Payment" />
-      <div className="mx-auto max-w-content px-4 py-8"><PaymentExplorer breakdowns={[]} rules={rules} /></div></>);
+      <div className="mx-auto max-w-content px-4 py-8"><PaymentExplorer breakdowns={[]} rules={rules} bank={bank} /></div></>);
 
-  const pax = await getPax();
+  const pax = (await getPax()) || [];
   const byStaff = groupBy(pax.filter((p) => p.staffName), (p) => p.staffName);
   const breakdowns = [...byStaff.entries()].map(([staff, rows]) => {
-    const hasStaff = rows.some((r) => (r.type || "").toLowerCase().includes("staff"));
-    const list = hasStaff ? rows : [{ staffName: staff, paxName: staff, type: "staff", age: "" }, ...rows];
+    const list = (rows || []).some((r) => (r.type || "").toLowerCase().includes("staff"))
+      ? rows
+      : [{ staffName: staff, paxName: staff, type: "staff", age: "" }, ...rows];
     return computeBreakdown(staff, list, rules);
   });
 
@@ -27,7 +36,7 @@ export default async function Page() {
       <PageHeader eyebrow="06 · Money" title="Payment"
         intro="Pecahan kos per orang bila bawa keluarga, dan calculator untuk kira sendiri." />
       <div className="mx-auto max-w-content px-4 py-8">
-        <PaymentExplorer breakdowns={breakdowns} rules={rules} />
+        <PaymentExplorer breakdowns={breakdowns} rules={rules} bank={bank} />
       </div>
     </>
   );

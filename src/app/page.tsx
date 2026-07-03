@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { getEventInfo, getContacts, getItinerary, getSettings } from "@/lib/sheets";
-import { NAV, numSetting, MEAL_ALLOWANCE_DEFAULT } from "@/lib/config";
+import { getEventInfo, getContacts, getItinerary, getSettings, getTransport } from "@/lib/sheets";
+import { NAV, numSetting, DRIVER_ALLOWANCE_DEFAULT, DRIVER_MIN_PAX_DEFAULT } from "@/lib/config";
 import SmartImage from "@/components/SmartImage";
 import Countdown from "@/components/Countdown";
 import { Pill } from "@/components/Card";
-import { phoneDisplay, telHref, groupBy } from "@/lib/format";
-import { PhoneIcon, WalletIcon } from "@/components/icons";
+import { phoneDisplay, telHref, groupBy, rm } from "@/lib/format";
+import { PhoneIcon, CarIcon } from "@/components/icons";
 
 export const revalidate = 60;
 
@@ -15,8 +15,13 @@ function dayKey(d: string): string {
 }
 
 export default async function Home() {
-  const [info, contacts, itinerary, settings] = await Promise.all([getEventInfo(), getContacts(), getItinerary(), getSettings()]);
-  const meal = numSetting(settings, "meal_allowance_per_pax", MEAL_ALLOWANCE_DEFAULT);
+  const [info, contacts, itinerary, settings, transport] = await Promise.all([getEventInfo(), getContacts(), getItinerary(), getSettings(), getTransport()]);
+  const driverAmount = numSetting(settings, "driver_allowance_amount", DRIVER_ALLOWANCE_DEFAULT);
+  const driverMin = numSetting(settings, "driver_min_pax", DRIVER_MIN_PAX_DEFAULT);
+  // Cars that qualify for the driver allowance (CAR carrying >= driver_min_pax incl. driver).
+  const carPax = new Map<string, number>();
+  for (const r of transport || []) if ((r.vehicleType || "").toUpperCase() === "CAR") carPax.set(r.vehicleId, (carPax.get(r.vehicleId) || 0) + 1);
+  const eligibleCars = [...carPax.values()].filter((n) => n >= driverMin).length;
   const dates = [info.startDate, info.endDate].filter(Boolean).join(" – ");
   const quick = NAV.filter((n) => n.href !== "/");
   const emergency = contacts.slice(0, 4);
@@ -53,11 +58,16 @@ export default async function Home() {
       <div className="mx-auto max-w-content space-y-10 px-4 py-8">
         {info.startDate && <Countdown date={info.startDate} />}
 
-        <section className="flex items-center gap-4 rounded-2xl border border-line bg-surface p-5">
-          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-brand-soft text-brand"><WalletIcon className="h-6 w-6" /></span>
-          <div>
-            <p className="tag text-muted">Meal allowance</p>
-            <p className="font-display text-xl font-semibold">{`RM ${meal}`} <span className="text-base font-normal text-muted">per pax</span></p>
+        <section className="grid gap-4 sm:grid-cols-2">
+          <div className="flex flex-col items-center rounded-2xl border border-line bg-surface p-6 text-center">
+            <span className="grid h-12 w-12 place-items-center rounded-xl bg-brand-soft text-brand"><CarIcon className="h-6 w-6" /></span>
+            <p className="tag mt-3 text-muted">Car allowance</p>
+            <p className="font-display text-2xl font-bold">{rm(driverAmount)}</p>
+            <p className="mt-1 text-sm text-muted">per qualifying car ({driverMin}+ people incl. driver)</p>
+          </div>
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-line bg-surface p-6 text-center">
+            <p className="font-display text-4xl font-bold text-brand">{eligibleCars}</p>
+            <p className="mt-1 tag text-muted">cars currently qualify</p>
           </div>
         </section>
 

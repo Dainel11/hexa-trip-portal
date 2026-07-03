@@ -23,11 +23,12 @@ function LeaderBadge() {
 }
 
 export default function SearchableList({
-  items, fields, placeholder, variant, requireSearch = false, driverMinPax = 3, banners,
+  items, fields, placeholder, variant, requireSearch = false, driverMinPax = 3, banners, summary,
 }: {
   items: Item[]; fields: string[]; placeholder: string; variant: Variant;
   requireSearch?: boolean; driverMinPax?: number;
   banners?: { src: string; label: string }[];
+  summary?: React.ReactNode;
 }) {
   const [q, setQ] = useState("");
   const term = q.trim().toLowerCase();
@@ -83,11 +84,20 @@ export default function SearchableList({
         </div>
       )}
 
+      {summary && (
+        <div aria-hidden={searching}
+          className={`overflow-hidden transition-all duration-300 ease-in-out motion-reduce:transition-none ${searching ? "mb-0 max-h-0 opacity-0" : "mb-6 max-h-[600px] opacity-100"}`}>
+          {summary}
+        </div>
+      )}
+
       {!showResults ? (
+        summary ? null : (
         <div className="rounded-2xl border border-dashed border-line bg-surface/40 p-8 text-center">
           <p className="font-display text-lg font-medium">Type your name to search</p>
           <p className="mt-1 text-sm text-muted">{groupVariant ? "We'll show your full group and highlight you." : `e.g. ${items.slice(0, 2).map((i) => i.name).filter(Boolean).join(", ") || "your name"}`}</p>
         </div>
+        )
       ) : count === 0 ? (
         <p className="rounded-2xl border border-dashed border-line p-8 text-center text-sm text-muted">No matches. Check the spelling or try a shorter name.</p>
       ) : variant === "rooms" ? (

@@ -10,7 +10,7 @@ const TONE: Record<string, string> = {
   infant: "bg-brand-soft text-brand",
 };
 
-export default function PaymentExplorer({ breakdowns, rules }: { breakdowns: Breakdown[]; rules: PaymentRules }) {
+export default function PaymentExplorer({ breakdowns, rules, bank }: { breakdowns: Breakdown[]; rules: PaymentRules; bank?: BankInfo }) {
   const [q, setQ] = useState("");
   const term = q.trim().toLowerCase();
   const matches = useMemo(
@@ -67,7 +67,62 @@ export default function PaymentExplorer({ breakdowns, rules }: { breakdowns: Bre
 
       {/* ── Calculator ── */}
       <Calculator rules={rules} />
+
+      {/* ── Bank / DuitNow payment instructions ── */}
+      <BankCard bank={bank} />
     </div>
+  );
+}
+
+type BankInfo = { bankName: string; accountName: string; accountNumber: string; qrUrl: string; reference: string };
+
+function CopyButton({ value }: { value: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      onClick={async () => {
+        try { await navigator.clipboard.writeText(value); setCopied(true); setTimeout(() => setCopied(false), 1600); } catch {}
+      }}
+      aria-label="Copy account number"
+      className="inline-flex min-h-[36px] items-center gap-1 rounded-full border border-line bg-surface px-3 py-1 text-xs font-medium transition hover:border-brand focus-visible:ring-2 focus-visible:ring-brand/40"
+    >
+      {copied ? "✓ Copied" : "Copy"}
+    </button>
+  );
+}
+
+function BankCard({ bank }: { bank?: BankInfo }) {
+  if (!bank || (!bank.accountNumber && !bank.bankName)) return null;
+  return (
+    <section>
+      <h2 className="font-display text-2xl font-semibold tracking-tight">How to pay</h2>
+      <p className="mt-1 text-sm text-muted">Bank transfer or DuitNow QR. Please use the reference below.</p>
+      <div className="mx-auto mt-4 grid max-w-2xl gap-5 rounded-2xl border border-line bg-surface p-6 sm:grid-cols-[1.3fr_1fr] sm:items-center">
+        <dl className="space-y-3 text-sm">
+          {bank.bankName && (<div><dt className="tag text-muted">Bank</dt><dd className="font-medium">{bank.bankName}</dd></div>)}
+          {bank.accountName && (<div><dt className="tag text-muted">Account name</dt><dd className="font-medium">{bank.accountName}</dd></div>)}
+          {bank.accountNumber && (
+            <div>
+              <dt className="tag text-muted">Account number</dt>
+              <dd className="flex flex-wrap items-center gap-2">
+                <span className="font-mono text-base font-semibold tracking-wide">{bank.accountNumber}</span>
+                <CopyButton value={bank.accountNumber} />
+              </dd>
+            </div>
+          )}
+          {bank.reference && (<div><dt className="tag text-muted">Payment reference</dt><dd className="font-medium">{bank.reference}</dd></div>)}
+        </dl>
+        {bank.qrUrl && (
+          <figure className="mx-auto w-full max-w-[220px]">
+            <div className="aspect-square overflow-hidden rounded-xl border border-line bg-white p-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={bank.qrUrl} alt="DuitNow QR code" width={220} height={220} loading="lazy" className="h-full w-full object-contain" />
+            </div>
+            <figcaption className="tag mt-2 text-center text-muted">Scan with any banking app</figcaption>
+          </figure>
+        )}
+      </div>
+    </section>
   );
 }
 

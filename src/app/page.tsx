@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getEventInfo, getContacts, getItinerary, getSettings, getDirectory } from "@/lib/sheets";
-import { NAV, numSetting, MEAL_ALLOWANCE_DEFAULT, DRIVER_ALLOWANCE_DEFAULT, DRIVER_MIN_PAX_DEFAULT } from "@/lib/config";
+import { NAV, numSetting, MEAL_ALLOWANCE_DEFAULT, DRIVER_ALLOWANCE_DEFAULT } from "@/lib/config";
 import SmartImage from "@/components/SmartImage";
 import Countdown from "@/components/Countdown";
 import GlobalSearch from "@/components/GlobalSearch";
@@ -18,7 +18,6 @@ function dayKey(d: string): string {
 export default async function Home() {
   const [info, contacts, itinerary, settings, directory] = await Promise.all([getEventInfo(), getContacts(), getItinerary(), getSettings(), getDirectory()]);
   const meal = numSetting(settings, "meal_allowance_per_pax", MEAL_ALLOWANCE_DEFAULT);
-  const driverMin = numSetting(settings, "driver_min_pax", DRIVER_MIN_PAX_DEFAULT);
   const driverAmount = numSetting(settings, "driver_allowance_amount", DRIVER_ALLOWANCE_DEFAULT);
   const dates = [info.startDate, info.endDate].filter(Boolean).join(" – ");
   const quick = NAV.filter((n) => n.href !== "/");
@@ -58,18 +57,18 @@ export default async function Home() {
 
         {info.startDate && <Countdown date={info.startDate} />}
 
-        <section className="grid gap-4 sm:grid-cols-2">
-          <div className="flex flex-col items-center rounded-2xl border border-amber/40 bg-amber/10 p-6 text-center">
-            <span role="img" aria-label="food" className="grid h-12 w-12 place-items-center rounded-xl bg-amber/20 text-2xl">🍱</span>
+        <section className="grid items-stretch gap-4 sm:grid-cols-2">
+          <div className="flex h-full flex-col items-center justify-center rounded-2xl border border-brand/25 bg-surface p-6 text-center">
+            <span role="img" aria-label="food" className="grid h-14 w-14 place-items-center rounded-2xl bg-brand-soft text-3xl">🍱</span>
             <p className="tag mt-3 text-muted">Food allowance</p>
-            <p className="font-display text-2xl font-bold">{`RM ${meal}`}</p>
+            <p className="font-display text-2xl font-bold text-brand">{`RM ${meal}`}</p>
             <p className="mt-1 text-sm text-muted">per pax</p>
           </div>
-          <div className="flex flex-col items-center rounded-2xl border-2 border-brand/40 bg-surface p-6 text-center">
-            <span role="img" aria-label="car" className="grid h-12 w-12 place-items-center rounded-xl bg-brand-soft text-2xl">🚗</span>
+          <div className="flex h-full flex-col items-center justify-center rounded-2xl border border-brand/25 bg-surface p-6 text-center">
+            <span role="img" aria-label="car" className="grid h-14 w-14 place-items-center rounded-2xl bg-brand-soft text-3xl">🚗</span>
             <p className="tag mt-3 text-muted">Car allowance</p>
-            <p className="font-display text-2xl font-bold">{rm(driverAmount)}</p>
-            <p className="mt-1 text-sm text-muted">per qualifying car ({driverMin}+ incl. driver)</p>
+            <p className="font-display text-2xl font-bold text-brand">{rm(driverAmount)}</p>
+            <p className="mt-1 text-sm text-muted">per qualifying car</p>
           </div>
         </section>
 

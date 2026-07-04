@@ -3,29 +3,40 @@ import { numSetting, DRIVER_ALLOWANCE_DEFAULT, DRIVER_MIN_PAX_DEFAULT } from "@/
 import PageHeader from "@/components/PageHeader";
 import SearchableList from "@/components/SearchableList";
 import EmptyState from "@/components/EmptyState";
+import PixelVehicle from "@/components/PixelVehicle";
 import { rm } from "@/lib/format";
 
 export const revalidate = 60;
 export const metadata = { title: "Transport" };
 
-function Metric({ emoji, label, stats, motion }: { emoji: string; label: string; stats: [string, number][]; motion: "bus" | "van" | "car" }) {
+function Metric({ label, stats, motion }: { label: string; stats: [string, number][]; motion: "bus" | "van" | "car" }) {
   return (
-    <div className={`flex flex-col items-center rounded-2xl border border-line bg-surface p-6 text-center ${motion === "car" ? "speed-lane group cursor-pointer" : ""}`}>
+    <div className={`rounded-2xl border border-line bg-surface p-5 ${motion === "car" ? "speed-lane group cursor-pointer" : ""}`}>
+      {/* Metric numbers stay anchored at the top — never hidden by the animation */}
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <span className="font-display text-base font-semibold">{label}</span>
+        <span className="flex items-center gap-4">
+          {stats.map(([k, v]) => (
+            <span key={k} className="text-right">
+              <b className="block font-display text-xl font-bold leading-none text-brand">{v}</b>
+              <span className="tag text-muted">{k}</span>
+            </span>
+          ))}
+        </span>
+      </div>
       <div className="road-strip flex h-16 w-full items-center justify-center">
         <span aria-hidden className="road-edge top" />
-        <span aria-hidden className={`road-lane ${motion === "bus" ? "scroll" : ""}`} />
+        <span aria-hidden className="road-lane" />
         <span aria-hidden className="road-edge bottom" />
-        <span role="img" aria-label={label} style={{ imageRendering: "pixelated" }}
-          className={`relative z-10 text-4xl leading-none drop-shadow-md ${motion === "van" ? "animate-van" : motion === "car" ? "speed-car" : ""}`}>{emoji}</span>
-      </div>
-      <p className="mt-3 font-display text-lg font-semibold">{label}</p>
-      <div className="mt-2 flex justify-center gap-6">
-        {stats.map(([k, v]) => (
-          <div key={k}>
-            <p className="font-display text-2xl font-bold text-brand">{v}</p>
-            <p className="tag text-muted">{k}</p>
-          </div>
-        ))}
+        {motion === "bus" && (
+          <span aria-hidden className="pointer-events-none absolute bottom-3 left-6 flex gap-1">
+            <span className="board-fig h-2 w-2 rounded-[1px] bg-amber" style={{ animationDelay: "0s" }} />
+            <span className="board-fig h-2 w-2 rounded-[1px] bg-water" style={{ animationDelay: "0.7s" }} />
+            <span className="board-fig h-2 w-2 rounded-[1px] bg-brand-soft" style={{ animationDelay: "1.4s" }} />
+          </span>
+        )}
+        <PixelVehicle type={motion}
+          className={`relative z-10 drop-shadow-md ${motion === "van" ? "animate-van-idle" : motion === "bus" ? "animate-bus-idle" : "speed-car"}`} />
       </div>
     </div>
   );
@@ -51,9 +62,9 @@ export default async function Page() {
 
   const summary = (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-      <Metric emoji="🚌" label="Buses" motion="bus" stats={[["Buses", count("BUS")], ["Passengers", pax("BUS")]]} />
-      <Metric emoji="🚐" label="Vans" motion="van" stats={[["Vans", count("VAN")], ["Passengers", pax("VAN")]]} />
-      <Metric emoji="🚗" label="Cars" motion="car" stats={[["Cars", count("CAR")]]} />
+      <Metric label="Buses" motion="bus" stats={[["Buses", count("BUS")], ["Passengers", pax("BUS")]]} />
+      <Metric label="Vans" motion="van" stats={[["Vans", count("VAN")], ["Passengers", pax("VAN")]]} />
+      <Metric label="Cars" motion="car" stats={[["Cars", count("CAR")]]} />
     </div>
   );
 
@@ -64,7 +75,7 @@ export default async function Page() {
       <div className="mx-auto max-w-content px-4 py-8">
         <div className="mb-6 rounded-2xl bg-brand p-5 text-center text-white shadow-sm" role="alert">
           <p className="flex items-center justify-center gap-2 font-display text-lg font-bold sm:text-xl">
-            <span role="img" aria-label="cash" className="text-2xl">💵</span> Driver allowance — {rm(amount)}
+            <span role="img" aria-label="coin" className="text-2xl">🪙</span> Driver allowance — {rm(amount)}
           </p>
           {parkingNote && (
             <p className="mx-auto mt-2 flex max-w-xl items-start justify-center gap-2 text-sm leading-relaxed text-white/90">

@@ -79,7 +79,7 @@ export default async function Page() {
           <div className="mt-4">
             {!rows.length ? <EmptyState title="No sizes yet" hint="Fill the TShirts tab." /> : (
               <SearchableList items={rows as unknown as Record<string, string>[]} fields={["name", "staff"]}
-                placeholder="Search any name — see the whole family's sizes…" variant="shirtFamily" />
+                placeholder="Search any name — see the whole family's sizes…" variant="shirtFamily" notFoundImg={settings.not_found_pixel_image || ""} />
             )}
           </div>
         </section>

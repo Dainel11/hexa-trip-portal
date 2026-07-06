@@ -53,7 +53,7 @@ export default async function Home() {
       </section>
 
       <div className="mx-auto max-w-content space-y-10 px-4 py-8">
-        <GlobalSearch entries={directory} />
+        <GlobalSearch entries={directory} notFoundImg={settings.not_found_pixel_image || ""} />
 
         {info.startDate && <Countdown date={info.startDate} />}
 

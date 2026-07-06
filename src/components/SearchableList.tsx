@@ -23,12 +23,12 @@ function LeaderBadge() {
 }
 
 export default function SearchableList({
-  items, fields, placeholder, variant, requireSearch = false, driverMinPax = 3, banners, summary,
+  items, fields, placeholder, variant, requireSearch = false, driverMinPax = 3, banners, summary, notFoundImg,
 }: {
   items: Item[]; fields: string[]; placeholder: string; variant: Variant;
   requireSearch?: boolean; driverMinPax?: number;
   banners?: { src: string; label: string }[];
-  summary?: React.ReactNode;
+  summary?: React.ReactNode; notFoundImg?: string;
 }) {
   const [q, setQ] = useState("");
   const term = q.trim().toLowerCase();
@@ -99,7 +99,13 @@ export default function SearchableList({
         </div>
         )
       ) : count === 0 ? (
-        <p className="rounded-2xl border border-dashed border-line p-8 text-center text-sm text-muted">No matches. Check the spelling or try a shorter name.</p>
+        <div className="rounded-2xl border border-dashed border-line p-8 text-center">
+          {notFoundImg && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={notFoundImg} alt="No results found" className="mx-auto mb-4 h-auto w-44 object-contain" />
+          )}
+          <p className="font-display font-bold">No participants found. Please check your spelling.</p>
+        </div>
       ) : variant === "rooms" ? (
         <RoomsView groups={groups} term={term} />
       ) : variant === "transport" ? (

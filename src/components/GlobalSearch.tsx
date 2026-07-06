@@ -16,7 +16,7 @@ function Field({ label, children, href }: { label: string; children: React.React
   return href ? <Link href={href} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 rounded-xl">{body}</Link> : body;
 }
 
-export default function GlobalSearch({ entries }: { entries: DirectoryEntry[] }) {
+export default function GlobalSearch({ entries, notFoundImg }: { entries: DirectoryEntry[]; notFoundImg?: string }) {
   const [q, setQ] = useState("");
   const [sel, setSel] = useState<DirectoryEntry | null>(null);
   const term = q.trim().toLowerCase();
@@ -67,7 +67,15 @@ export default function GlobalSearch({ entries }: { entries: DirectoryEntry[] })
                 </span>
                 {e.isLeader && <span className="shrink-0 rounded-full bg-amber/15 px-2 py-0.5 text-[10px] font-bold uppercase text-amber"><span className="star-glow" role="img" aria-label="star">🌟</span> Leader</span>}
               </button>
-            )) : <p className="px-4 py-6 text-center text-sm text-muted">No one found for “{q}”.</p>}
+            )): (
+              <div className="px-4 py-6 text-center">
+                {notFoundImg && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={notFoundImg} alt="No results found" className="mx-auto mb-3 h-auto w-40 object-contain" />
+                )}
+                <p className="font-display font-bold">No participants found. Please check your spelling.</p>
+              </div>
+            )}
           </div>
         )}
       </div>

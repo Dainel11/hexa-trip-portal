@@ -96,7 +96,7 @@ export default async function Page() {
             }))}
             fields={["name", "vehicleId", "plate"]}
             placeholder="Search your name…" variant="transport" driverMinPax={minPax}
-            summary={summary} />
+            summary={summary} notFoundImg={settings.not_found_pixel_image || ""} />
         )}
       </div>
     </>

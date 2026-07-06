@@ -17,10 +17,11 @@ export default async function Page() {
     qrUrl: settings.duitnow_qr || settings.bank_qr_url || "",
     reference: settings.payment_reference || "",
   };
+  const lockerImage = settings.locker_rental_image || "";
 
   if (!SHOW_PAYMENTS)
     return (<><PageHeader eyebrow="06 · Money" title="Payment" />
-      <div className="mx-auto max-w-content px-4 py-8"><PaymentExplorer breakdowns={[]} rules={rules} bank={bank} /></div></>);
+      <div className="mx-auto max-w-content px-4 py-8"><PaymentExplorer breakdowns={[]} rules={rules} bank={bank} lockerImage={lockerImage} /></div></>);
 
   const pax = (await getPax()) || [];
   const byStaff = groupBy(pax.filter((p) => p.staffName), (p) => p.staffName);
@@ -36,7 +37,7 @@ export default async function Page() {
       <PageHeader eyebrow="06 · Money" title="Payment"
         intro="Pecahan kos per orang bila bawa keluarga, dan calculator untuk kira sendiri." />
       <div className="mx-auto max-w-content px-4 py-8">
-        <PaymentExplorer breakdowns={breakdowns} rules={rules} bank={bank} />
+        <PaymentExplorer breakdowns={breakdowns} rules={rules} bank={bank} lockerImage={lockerImage} />
       </div>
     </>
   );

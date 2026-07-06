@@ -26,6 +26,7 @@ export default async function Page() {
           fields={["name", "roomId", "roomTypeLabel"]}
           placeholder="Search your name or room (e.g. FS 1)…"
           variant="rooms"
+          notFoundImg={settings.not_found_pixel_image || ""}
           banners={[
             { src: settings.room_fs_image || "", label: "Family Studio" },
             { src: settings.room_3r_image || "", label: "3 Bedroom Condo" },

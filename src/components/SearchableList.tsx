@@ -70,19 +70,20 @@ export default function SearchableList({
 
       {banners && banners.length > 0 && (
         <div aria-hidden={searching}
-          className={`grid grid-cols-2 gap-6 overflow-hidden transition-all duration-300 ease-in-out motion-reduce:transition-none sm:grid-cols-2 ${searching ? "mb-0 max-h-0 opacity-0" : "mb-6 max-h-[440px] opacity-100"}`}>
+          className={`grid grid-cols-1 gap-6 w-full mx-auto ${searching ? "mb-0 max-h-0 opacity-0" : "mb-6 opacity-100"}`}>
           {banners.map((b) => (
-            <figure key={b.label} className="overflow-hidden rounded-2xl border border-line bg-surface">
-              <div className="flex items-center justify-center bg-gradient-to-b from-brand-soft/30 to-surface p-3">
+            <figure key={b.label} className="overflow-hidden rounded-2xl border border-line bg-surface w-full">
+              <div className="flex items-center justify-center bg-gradient-to-b from-brand-soft/30 to-surface p-4 w-full">
                 {b.src
-                  ? <img src={b.src} alt={b.label} loading="lazy" className="mx-auto h-auto w-full h-auto object-contain rounded-2xl" />
+                  ? <img src={b.src} alt={b.label} loading="lazy" className="w-full max-w-3xl h-auto object-contain mx-auto rounded-xl shadow-sm" />
                   : <span className="tag text-muted">Image coming soon</span>}
               </div>
-              <figcaption className="tag px-4 py-2 text-center font-medium uppercase text-muted">{b.label}</figcaption>
+              <figcaption className="tag px-4 py-2.5 text-center font-medium uppercase text-muted border-t border-line/50 bg-canvas">{b.label}</figcaption>
             </figure>
           ))}
         </div>
       )}
+
 
       {summary && (
         <div aria-hidden={searching}

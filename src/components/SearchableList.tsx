@@ -31,6 +31,7 @@ export default function SearchableList({
   summary?: React.ReactNode; notFoundImg?: string;
 }) {
   const [q, setQ] = useState("");
+  const [isMapOpen, setIsMapOpen] = useState(false);
   const term = q.trim().toLowerCase();
   const searching = term.length > 0;
   const groupVariant = variant === "rooms" || variant === "transport" || variant === "shirtFamily";
@@ -58,6 +59,28 @@ export default function SearchableList({
 
   return (
     <div>
+            {/* 🗺️ Peta Lokasi Blok Condo D'Savoy (Accordion Style) */}
+      {variant === "rooms" && (
+        <div className="mb-5 rounded-2xl border border-line bg-surface overflow-hidden transition-all duration-300">
+          <button
+            onClick={() => setIsMapOpen(!isMapOpen)}
+            className="flex w-full items-center justify-between px-5 py-3.5 text-left font-display font-semibold text-brand hover:bg-brand-soft/30 transition focus:outline-none"
+          >
+            <span className="flex items-center gap-2">🗺️ Lihat Peta Lokasi Blok Condo D'Savoy</span>
+            <span className={`transform transition-transform duration-300 text-lg ${isMapOpen ? "rotate-180" : ""}`}>🔽</span>
+          </button>
+          
+          <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isMapOpen ? "max-h-[800px] p-4 border-t border-line/50 bg-white" : "max-h-0"}`}>
+            <img 
+              src="https://image2url.com" 
+              className="w-full max-w-2xl h-auto object-contain rounded-xl mx-auto shadow-sm" 
+              alt="Condo D'Savoy Map" 
+              loading="lazy"
+            />
+          </div>
+        </div>
+      )}
+
       <div className="sticky top-[68px] z-10 -mx-4 mb-5 bg-canvas/90 px-4 py-2 backdrop-blur lg:top-[104px]">
         <div className="relative">
           <span aria-hidden className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted">⌕</span>

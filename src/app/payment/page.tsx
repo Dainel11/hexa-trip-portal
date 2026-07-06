@@ -21,7 +21,7 @@ export default async function Page() {
 
   if (!SHOW_PAYMENTS)
     return (<><PageHeader eyebrow="06 · Money" title="Payment" />
-      <div className="mx-auto max-w-content px-4 py-8"><PaymentExplorer breakdowns={[]} rules={rules} bank={bank} lockerImage={lockerImage} /></div></>);
+      <div className="mx-auto max-w-content px-4 py-8"><PaymentExplorer breakdowns={[]} rules={rules} bank={bank} lockerImage={lockerImage} notFoundImg={settings.not_found_pixel_image || ""} /></div></>);
 
   const pax = (await getPax()) || [];
   const byStaff = groupBy(pax.filter((p) => p.staffName), (p) => p.staffName);
@@ -37,7 +37,7 @@ export default async function Page() {
       <PageHeader eyebrow="06 · Money" title="Payment"
         intro="Pecahan kos per orang bila bawa keluarga, dan calculator untuk kira sendiri." />
       <div className="mx-auto max-w-content px-4 py-8">
-        <PaymentExplorer breakdowns={breakdowns} rules={rules} bank={bank} lockerImage={lockerImage} />
+        <PaymentExplorer breakdowns={breakdowns} rules={rules} bank={bank} lockerImage={lockerImage} notFoundImg={settings.not_found_pixel_image || ""} />
       </div>
     </>
   );

@@ -3,7 +3,6 @@ import { numSetting, DRIVER_ALLOWANCE_DEFAULT, DRIVER_MIN_PAX_DEFAULT } from "@/
 import PageHeader from "@/components/PageHeader";
 import SearchableList from "@/components/SearchableList";
 import EmptyState from "@/components/EmptyState";
-import PixelVehicle from "@/components/PixelVehicle";
 import { rm } from "@/lib/format";
 
 export const revalidate = 60;
@@ -11,8 +10,8 @@ export const metadata = { title: "Transport" };
 
 function Metric({ label, stats, motion }: { label: string; stats: [string, number][]; motion: "bus" | "van" | "car" }) {
   return (
-    <div className={`rounded-2xl border border-line bg-surface p-5 ${motion === "car" ? "speed-lane group cursor-pointer" : ""}`}>
-      {/* Metric numbers stay anchored at the top — never hidden by the animation */}
+    <div className="rounded-2xl border border-line bg-surface p-5">
+      {/* Numbers stay locked at the top — never hidden by the animation */}
       <div className="mb-3 flex items-center justify-between gap-2">
         <span className="font-display text-base font-semibold">{label}</span>
         <span className="flex items-center gap-4">
@@ -24,19 +23,21 @@ function Metric({ label, stats, motion }: { label: string; stats: [string, numbe
           ))}
         </span>
       </div>
-      <div className="road-strip flex h-16 w-full items-center justify-center">
-        <span aria-hidden className="road-edge top" />
-        <span aria-hidden className="road-lane" />
-        <span aria-hidden className="road-edge bottom" />
+      <div className="relative h-32 w-full overflow-hidden rounded-xl bg-[#eaf1ee]">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={`/veh/${motion}.png`} alt={`${label} diorama`}
+          className={`absolute inset-0 h-full w-full object-contain ${motion === "van" ? "animate-van-shake" : motion === "car" ? "animate-scene-drift" : "animate-bus-idle2"}`} />
         {motion === "bus" && (
-          <span aria-hidden className="pointer-events-none absolute bottom-3 left-6 flex gap-1">
-            <span className="board-fig h-2 w-2 rounded-[1px] bg-amber" style={{ animationDelay: "0s" }} />
-            <span className="board-fig h-2 w-2 rounded-[1px] bg-water" style={{ animationDelay: "0.7s" }} />
-            <span className="board-fig h-2 w-2 rounded-[1px] bg-brand-soft" style={{ animationDelay: "1.4s" }} />
+          <span aria-hidden className="pointer-events-none absolute bottom-6 left-6">
+            <span className="board-walk absolute block h-1.5 w-1.5 rounded-[1px] bg-[#c0653a]" style={{ "--walk": "40px", animationDelay: "0s" } as React.CSSProperties} />
+            <span className="board-walk absolute block h-1.5 w-1.5 rounded-[1px] bg-[#3f6fb0]" style={{ "--walk": "40px", animationDelay: "1s" } as React.CSSProperties} />
+            <span className="board-walk absolute block h-1.5 w-1.5 rounded-[1px] bg-[#4a7c59]" style={{ "--walk": "40px", animationDelay: "2s" } as React.CSSProperties} />
           </span>
         )}
-        <PixelVehicle type={motion}
-          className={`relative z-10 drop-shadow-md ${motion === "van" ? "animate-van-idle" : motion === "bus" ? "animate-bus-idle" : "speed-car"}`} />
+        {motion === "car" && (
+          <span aria-hidden className="headlight-glow pointer-events-none absolute left-[40%] top-[56%] h-10 w-16 -translate-x-1/2 -translate-y-1/2"
+            style={{ background: "radial-gradient(circle, rgba(255,214,80,0.85) 0%, rgba(255,214,80,0) 70%)" }} />
+        )}
       </div>
     </div>
   );

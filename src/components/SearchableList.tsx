@@ -73,9 +73,9 @@ export default function SearchableList({
           className={`grid grid-cols-1 gap-4 overflow-hidden transition-all duration-300 ease-in-out motion-reduce:transition-none sm:grid-cols-2 ${searching ? "mb-0 max-h-0 opacity-0" : "mb-6 max-h-[440px] opacity-100"}`}>
           {banners.map((b) => (
             <figure key={b.label} className="overflow-hidden rounded-2xl border border-line bg-surface">
-              <div className="flex aspect-[16/9] items-center justify-center bg-gradient-to-b from-brand-soft/30 to-surface p-3">
+              <div className="flex items-center justify-center bg-gradient-to-b from-brand-soft/30 to-surface p-3">
                 {b.src
-                  ? <img src={b.src} alt={b.label} loading="lazy" className="h-full w-full object-contain" />
+                  ? <img src={b.src} alt={b.label} loading="lazy" className="mx-auto h-auto w-full max-w-5xl object-contain" />
                   : <span className="tag text-muted">Image coming soon</span>}
               </div>
               <figcaption className="tag px-4 py-2 text-center font-medium uppercase text-muted">{b.label}</figcaption>
@@ -102,7 +102,7 @@ export default function SearchableList({
         <div className="rounded-2xl border border-dashed border-line p-8 text-center">
           {notFoundImg && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={notFoundImg} alt="No results found" className="mx-auto mb-4 h-auto w-40 object-contain" />
+            <img src={notFoundImg} alt="No results found" className="mx-auto mb-4 h-auto w-28 object-contain" />
           )}
           <p className="font-display font-bold">No participants found. Please check your spelling.</p>
         </div>

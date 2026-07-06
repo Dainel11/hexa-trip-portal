@@ -10,7 +10,7 @@ const TONE: Record<string, string> = {
   infant: "bg-brand-soft text-brand",
 };
 
-export default function PaymentExplorer({ breakdowns, rules, bank, lockerImage }: { breakdowns: Breakdown[]; rules: PaymentRules; bank?: BankInfo; lockerImage?: string }) {
+export default function PaymentExplorer({ breakdowns, rules, bank, lockerImage, notFoundImg }: { breakdowns: Breakdown[]; rules: PaymentRules; bank?: BankInfo; lockerImage?: string; notFoundImg?: string }) {
   const [q, setQ] = useState("");
   const term = q.trim().toLowerCase();
   const matches = useMemo(
@@ -24,6 +24,7 @@ export default function PaymentExplorer({ breakdowns, rules, bank, lockerImage }
       <section>
         <h2 className="font-display text-2xl font-semibold tracking-tight">Your cost breakdown</h2>
         <p className="mt-1 text-sm text-muted">Search your name to see who you bring and the cost per person.</p>
+        <div className="mt-4"><LockerInfo image={lockerImage} /></div>
         <div className="relative mt-4">
           <span aria-hidden className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted">⌕</span>
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search your name…"
@@ -58,9 +59,15 @@ export default function PaymentExplorer({ breakdowns, rules, bank, lockerImage }
               ))}
             </div>
           ) : (
-            <p className="mt-5 rounded-2xl border border-dashed border-line p-8 text-center text-sm text-muted">
-              No record for “{q}”. Your pax list may not be filled in yet — use the calculator below.
-            </p>
+            <div className="mt-5 rounded-2xl border border-dashed border-line p-8 text-center">
+              {notFoundImg && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={notFoundImg} alt="No results found" className="mx-auto mb-3 h-auto w-24 object-contain" />
+              )}
+              <p className="text-sm text-muted">
+                No record for “{q}”. Your pax list may not be filled in yet — use the calculator below.
+              </p>
+            </div>
           )
         )}
       </section>
@@ -70,7 +77,6 @@ export default function PaymentExplorer({ breakdowns, rules, bank, lockerImage }
 
       {/* ── Bank / DuitNow payment instructions ── */}
       <BankCard bank={bank} />
-      <LockerInfo image={lockerImage} />
     </div>
   );
 }
@@ -174,7 +180,7 @@ function LockerInfo({ image }: { image?: string }) {
   return (
     <div className="text-center">
       <button onClick={() => setOpen(true)}
-        className="inline-flex min-h-[44px] items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-brand shadow-sm ring-1 ring-black/5 transition animate-pulse hover:brightness-95 focus-visible:ring-2 focus-visible:ring-brand/40"
+        className="inline-flex min-h-[44px] items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-[#0e6e5c] shadow-sm ring-1 ring-black/5 transition animate-pulse hover:brightness-95 focus-visible:ring-2 focus-visible:ring-brand/40"
         style={{ backgroundColor: "#facc15" }}>
         🔑 Info Sewa Loker Water World
       </button>

@@ -4,6 +4,7 @@ import { NAV, numSetting, MEAL_ALLOWANCE_DEFAULT, DRIVER_ALLOWANCE_DEFAULT } fro
 import SmartImage from "@/components/SmartImage";
 import Countdown from "@/components/Countdown";
 import GlobalSearch from "@/components/GlobalSearch";
+import Reveal from "@/components/Reveal";
 import { Pill } from "@/components/Card";
 import { phoneDisplay, telHref, groupBy, rm } from "@/lib/format";
 import { PhoneIcon } from "@/components/icons";
@@ -53,10 +54,11 @@ export default async function Home() {
       </section>
 
       <div className="mx-auto max-w-content space-y-10 px-4 py-8">
-        <GlobalSearch entries={directory} notFoundImg={settings.not_found_pixel_image || ""} />
+        <Reveal><GlobalSearch entries={directory} notFoundImg={settings.not_found_pixel_image || ""} /></Reveal>
 
-        {info.startDate && <Countdown date={info.startDate} />}
+        {info.startDate && <Reveal delay={0.05}><Countdown date={info.startDate} /></Reveal>}
 
+        <Reveal delay={0.1}>
         <section className="grid items-stretch gap-4 sm:grid-cols-2">
           <div className="flex h-full flex-col items-center justify-center rounded-2xl border border-brand/25 bg-surface p-6 text-center">
             <span role="img" aria-label="food" className="grid h-14 w-14 place-items-center rounded-2xl bg-brand-soft text-3xl">🍱</span>
@@ -71,8 +73,10 @@ export default async function Home() {
             <p className="mt-1 text-sm text-muted">per qualifying car</p>
           </div>
         </section>
+        </Reveal>
 
         {scheduleDay.length > 0 && (
+          <Reveal delay={0.15}>
           <section className="rounded-2xl border border-line bg-surface p-5">
             <div className="flex items-center justify-between">
               <p className="tag text-brand">{scheduleLabel}</p>
@@ -87,9 +91,11 @@ export default async function Home() {
               ))}
             </ol>
           </section>
+          </Reveal>
         )}
 
         {emergency.length > 0 && (
+          <Reveal delay={0.2}>
           <section>
             <p className="tag text-muted">Need help? Call a contact person</p>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -102,8 +108,10 @@ export default async function Home() {
               ))}
             </div>
           </section>
+          </Reveal>
         )}
 
+        <Reveal delay={0.25}>
         <section>
           <p className="tag text-muted">Jump to</p>
           <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
@@ -115,6 +123,7 @@ export default async function Home() {
             ))}
           </div>
         </section>
+        </Reveal>
       </div>
     </>
   );

@@ -94,6 +94,19 @@ body {
     50%      { filter: drop-shadow(0 0 5px rgba(245, 180, 60, 0.95)); transform: scale(1.12); }
   }
 
+  /* Image-diorama transport animations */
+  .animate-van-shake { animation: vanShake 0.9s ease-in-out infinite; will-change: transform; }
+  @keyframes vanShake { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-1.5px); } }
+  .animate-scene-drift { animation: sceneDrift 5s ease-in-out infinite; will-change: transform; }
+  @keyframes sceneDrift { 0%,100% { transform: translateX(-5px); } 50% { transform: translateX(5px); } }
+  .animate-bus-idle2 { animation: busIdle2 3.2s ease-in-out infinite; will-change: transform; }
+  @keyframes busIdle2 { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-1px); } }
+  .board-walk { animation: boardWalk 3s ease-in-out infinite; will-change: transform, opacity; }
+  @keyframes boardWalk { 0% { transform: translateX(0); opacity: 0; } 12% { opacity: 1; } 72% { transform: translateX(var(--walk,40px)); opacity: 1; } 85% { opacity: 0; } 100% { opacity: 0; } }
+  .headlight-glow { animation: hlGlow 1.5s ease-in-out infinite; will-change: opacity; }
+  @keyframes hlGlow { 0%,100% { opacity: 0.35; } 50% { opacity: 0.85; } }
+
+
   /* Pixel highway: van idle vibration, bus idle shake, passengers boarding */
   .animate-van-idle { animation: vanIdle 0.8s ease-in-out infinite; will-change: transform; }
   @keyframes vanIdle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }

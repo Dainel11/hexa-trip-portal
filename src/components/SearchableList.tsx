@@ -102,7 +102,7 @@ export default function SearchableList({
         <div className="rounded-2xl border border-dashed border-line p-8 text-center">
           {notFoundImg && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={notFoundImg} alt="No results found" className="mx-auto mb-4 h-auto w-30 object-contain" />
+            <img src={notFoundImg} alt="No results found" className="mx-auto mb-4 h-auto w-40 object-contain" />
           )}
           <p className="font-display font-bold">No participants found. Please check your spelling.</p>
         </div>

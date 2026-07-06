@@ -59,25 +59,15 @@ export default function SearchableList({
 
   return (
     <div>
-            {/* 🗺️ Peta Lokasi Blok Condo D'Savoy (Accordion Style) */}
+      {/* 🗺️ Smart Map Popup Button (Locker Style) - Placed ABOVE Search Bar */}
       {variant === "rooms" && (
-        <div className="mb-5 rounded-2xl border border-line bg-surface overflow-hidden transition-all duration-300">
+        <div className="mb-4 text-center sm:text-left">
           <button
-            onClick={() => setIsMapOpen(!isMapOpen)}
-            className="flex w-full items-center justify-between px-5 py-3.5 text-left font-display font-semibold text-brand hover:bg-brand-soft/30 transition focus:outline-none"
+            onClick={() => setIsMapOpen(true)}
+            className="inline-flex items-center gap-2 rounded-full bg-amber-400 px-5 py-2.5 text-sm font-semibold text-[#0e6e5c] shadow-sm transition hover:bg-amber-500 animate-pulse focus:outline-none focus:ring-2 focus:ring-amber-400/50"
           >
-            <span className="flex items-center gap-2">🗺️ Lihat Peta Lokasi Blok Condo D'Savoy</span>
-            <span className={`transform transition-transform duration-300 text-lg ${isMapOpen ? "rotate-180" : ""}`}>🔽</span>
+            🗺️ Lihat Peta Lokasi Blok Condo D'Savoy (Penting!)
           </button>
-          
-          <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isMapOpen ? "max-h-[800px] p-4 border-t border-line/50 bg-white" : "max-h-0"}`}>
-            <img 
-              src="https://image2url.com" 
-              className="w-full max-w-2xl h-auto object-contain rounded-xl mx-auto shadow-sm" 
-              alt="Condo D'Savoy Map" 
-              loading="lazy"
-            />
-          </div>
         </div>
       )}
 
@@ -107,7 +97,6 @@ export default function SearchableList({
         </div>
       )}
 
-
       {summary && (
         <div aria-hidden={searching}
           className={`overflow-hidden transition-all duration-300 ease-in-out motion-reduce:transition-none ${searching ? "mb-0 max-h-0 opacity-0" : "mb-6 max-h-[600px] opacity-100"}`}>
@@ -125,7 +114,6 @@ export default function SearchableList({
       ) : count === 0 ? (
         <div className="rounded-2xl border border-dashed border-line p-8 text-center">
           {notFoundImg && (
-            // eslint-disable-next-line @next/next/no-img-element
             <img src={notFoundImg} alt="No results found" className="mx-auto mb-4 h-auto w-28 object-contain" />
           )}
           <p className="font-display font-bold">No participants found. Please check your spelling.</p>
@@ -140,6 +128,29 @@ export default function SearchableList({
         <TshirtView rows={rows} />
       ) : (
         <PaymentView rows={rows} />
+      )}
+
+      {/* 🔑 Premium Modal Popup Overlay for Rooms Map */}
+      {isMapOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
+          <div className="relative w-full max-w-xl overflow-hidden rounded-2xl border border-line bg-surface p-4 shadow-xl">
+            <div className="max-h-[75vh] overflow-y-auto rounded-xl border border-line bg-white p-1">
+              <img 
+                src="https://image2url.com" 
+                className="w-full h-auto object-contain rounded-lg" 
+                alt="Condo D'Savoy Map" 
+              />
+            </div>
+            <div className="mt-4 flex justify-end">
+              <button
+                onClick={() => setIsMapOpen(false)}
+                className="rounded-full bg-line px-5 py-2 text-xs font-semibold text-foreground transition hover:bg-line/80 focus:outline-none"
+              >
+                Tutup Peta
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -182,128 +193,6 @@ function RoomsView({ groups, term }: { groups: [string, Item[]][]; term: string 
           </div>
         );
       })}
-    </div>
-  );
-}
-
-function ShirtFamilyView({ groups, term }: { groups: [string, Item[]][]; term: string }) {
-  return (
-    <div className="grid gap-4 sm:grid-cols-2">
-      {groups.map(([staff, ppl]) => {
-        const hasYou = ppl.some((p) => isMatch(p["name"], term));
-        const owner = ppl.find((p) => !(p["relationship"] || "")) ?? ppl[0];
-        const family = ppl.filter((p) => p !== owner);
-        const sizeOf = (p: Item) => sizeOrBlank(p["size"] || p["safariSize"]);
-        return (
-          <div key={staff} className={`rounded-2xl border bg-surface p-5 transition ${hasYou ? "glow-you border-brand" : "border-line"}`}>
-            <div className="flex items-center justify-between gap-2">
-              <Pill tone="brand">Family</Pill>
-              <span className="tag text-muted">{ppl.length} {ppl.length === 1 ? "person" : "people"}</span>
-            </div>
-            <p className="mt-3 flex flex-wrap items-center gap-2 border-b border-line/70 pb-2.5">
-              <span className={isMatch(owner["name"], term) ? "font-bold text-brand" : "font-semibold"}>{owner["name"]}</span>
-              {isMatch(owner["name"], term) && <YouBadge />}
-              <span className="ml-auto">{sizeOf(owner) ? <Pill tone="amber">{sizeOf(owner)}</Pill> : <span className="tag text-muted">size TBC</span>}</span>
-            </p>
-            {family.length > 0 && (
-              <ul className="mt-3 space-y-1.5">
-                {family.map((f, i) => {
-                  const you = isMatch(f["name"], term);
-                  const sz = sizeOf(f);
-                  return (
-                    <li key={i} className={`flex items-center gap-2 text-sm ${you ? "font-bold text-brand" : ""}`}>
-                      {f["relationship"] && <span className="tag text-muted">{f["relationship"]}</span>}
-                      <span>{f["name"]}</span>{you && <YouBadge />}
-                      <span className="ml-auto">{sz ? <Pill tone="water">{sz}</Pill> : <span className="tag text-muted">TBC</span>}</span>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function TransportView({ groups, term, minPax }: { groups: [string, Item[]][]; term: string; minPax: number }) {
-  return (
-    <div className="grid gap-4 sm:grid-cols-2">
-      {groups.map(([veh, ppl]) => {
-        const type = (ppl[0]?.["vehicleType"] || "CAR").toUpperCase();
-        const isCar = type === "CAR";
-        const driver = ppl.find((p) => p["isDriver"] === "1");
-        const plate = ppl.find((p) => p["plate"])?.["plate"];
-        const pic = ppl.find((p) => p["pic"])?.["pic"];
-        // Eligibility is computed server-side (rule C: brought family OR car carries minPax incl. driver).
-        const eligible = ppl.some((p) => p["eligible"] === "1");
-        const hasYou = ppl.some((p) => isMatch(p["name"], term));
-        return (
-          <div key={veh} className={`rounded-2xl border bg-surface p-5 transition ${hasYou ? "glow-you border-brand" : "border-line"}`}>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="grid h-12 w-12 place-items-center rounded-xl bg-water/15 text-water"><VehicleIcon vehicle={veh} className="h-7 w-7" /></span>
-              <span className="font-display text-xl font-semibold">{veh}</span>
-              {isCar && plate && <span className="tag rounded-full bg-line px-2 py-0.5 text-muted">{plate}</span>}
-              <span className="ml-auto tag text-muted">{ppl.length} pax</span>
-            </div>
-
-            {driver && (
-              <p className="mt-3 text-sm"><span className="tag text-amber">Driver</span>{" "}
-                <span className={isMatch(driver["name"], term) ? "font-bold text-brand" : "font-medium"}>{driver["name"]}</span>
-                {isMatch(driver["name"], term) && <> <YouBadge /></>}
-                {eligible && <span className="badge-glow ml-2 rounded-full bg-brand-soft px-2 py-0.5 tag text-brand">Allowance eligible</span>}
-              </p>
-            )}
-            {!isCar && pic && <p className="mt-2 text-sm text-muted"><span className="tag">PIC</span> {pic}</p>}
-
-            <ul className="mt-3 space-y-1.5">
-              {ppl.filter((p) => p !== driver).map((p, i) => {
-                const you = isMatch(p["name"], term);
-                return <li key={i} className={`flex items-center gap-2 border-t border-line/70 pt-1.5 text-sm first:border-0 first:pt-0 ${you ? "font-bold text-brand" : ""}`}><span aria-hidden className="text-muted">·</span>{p["name"]}{you && <YouBadge />}</li>;
-              })}
-            </ul>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function sizeOrBlank(v: string): string {
-  // ROSTER_SYSTEM stores curated sizes: letters (S–7XL) AND valid kids' numeric sizes (22–34).
-  const t = (v || "").trim();
-  return t; // trust the sheet; only truly empty is blank
-}
-
-function TshirtView({ rows }: { rows: Item[] }) {
-  return (
-    <ul className="grid gap-2 sm:grid-cols-2">
-      {rows.map((r, i) => {
-        const safari = sizeOrBlank(r["safariSize"]);
-        const water = sizeOrBlank(r["waterworldSize"]);
-        return (
-          <li key={i} className="flex items-center justify-between rounded-xl border border-line bg-surface px-4 py-3">
-            <span className="font-medium">{r["name"]}</span>
-            <span className="flex gap-2">
-              {safari && <Pill tone="amber">Safari {safari}</Pill>}
-              {water && <Pill tone="water">Water {water}</Pill>}
-              {!safari && !water && <span className="tag text-muted">size TBC</span>}
-            </span>
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
-
-function PaymentView({ rows }: { rows: Item[] }) {
-  return (
-    <div className="overflow-hidden rounded-2xl border border-line">
-      <table className="w-full text-sm">
-        <thead className="bg-brand-soft text-left"><tr className="tag text-brand"><th className="px-4 py-3">Staff / Family</th><th className="px-4 py-3 text-center">Pax</th><th className="px-4 py-3 text-right">Amount</th></tr></thead>
-        <tbody>{rows.map((r, i) => (<tr key={i} className="border-t border-line bg-surface"><td className="px-4 py-3 font-medium">{r["familyGroup"]}</td><td className="px-4 py-3 text-center">{r["paxCount"] || "—"}</td><td className="px-4 py-3 text-right font-semibold">{rm(r["amountDue"])}</td></tr>))}</tbody>
-      </table>
     </div>
   );
 }

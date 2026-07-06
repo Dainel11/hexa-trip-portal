@@ -75,7 +75,7 @@ export default function SearchableList({
             <figure key={b.label} className="overflow-hidden rounded-2xl border border-line bg-surface">
               <div className="flex items-center justify-center bg-gradient-to-b from-brand-soft/30 to-surface p-3">
                 {b.src
-                  ? <img src={b.src} alt={b.label} loading="lazy" className="mx-auto h-auto w-full max-w-md object-contain" />
+                  ? <img src={b.src} alt={b.label} loading="lazy" className="mx-auto h-auto w-full max-w-sm object-contain" />
                   : <span className="tag text-muted">Image coming soon</span>}
               </div>
               <figcaption className="tag px-4 py-2 text-center font-medium uppercase text-muted">{b.label}</figcaption>

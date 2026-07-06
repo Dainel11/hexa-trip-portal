@@ -3,6 +3,7 @@ import { Bricolage_Grotesque, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import PageTransition from "@/components/PageTransition";
 import AnnouncementBanner from "@/components/AnnouncementBanner";
 import { SITE_NAME } from "@/lib/config";
 import { getSettings } from "@/lib/sheets";
@@ -24,7 +25,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <Nav logo={settings.logo_url} />
         <AnnouncementBanner title={settings.announcement_title} text={settings.announcement} />
-        <main className="min-h-[70vh] pb-24 lg:pb-0">{children}</main>
+        <main className="min-h-[70vh] pb-24 lg:pb-0"><PageTransition>{children}</PageTransition></main>
         <Footer />
       </body>
     </html>

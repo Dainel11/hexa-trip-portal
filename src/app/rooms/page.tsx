@@ -2,6 +2,7 @@ import { getRooms, getRoomTypes, getSettings } from "@/lib/sheets";
 import { roomLabel } from "@/lib/config";
 import PageHeader from "@/components/PageHeader";
 import SearchableList from "@/components/SearchableList";
+import MapAccordion from "@/components/MapAccordion";
 import EmptyState from "@/components/EmptyState";
 
 export const revalidate = 60;
@@ -21,6 +22,7 @@ export default async function Page() {
       <PageHeader eyebrow="02 · Stay" title="Room List"
         intro="Search your name to find your room." />
       <div className="mx-auto max-w-content px-4 py-8">
+        <MapAccordion image={settings.rooms_map_image || ""} label="🗺️ Lihat Peta Lokasi Blok Condo D'Savoy" />
         <SearchableList
           items={items as unknown as Record<string, string>[]}
           fields={["name", "roomId", "roomTypeLabel"]}

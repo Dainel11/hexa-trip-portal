@@ -95,24 +95,28 @@ export default function GlobalSearch({
           <div className="animate-modal-in my-auto max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-line bg-canvas p-6 text-left shadow-2xl"
             onClick={(e) => e.stopPropagation()}>
             
-            {/* KOORDINAT HEADER BESAR: Saiz maskot dikembangkan penuh secara simetri */}
+            {/* KEKAL SEBELAH-SEBELAH (`flex-row`) UNTUK MOBILE & DESKTOP — SUPER COMEL */}
             <div className="flex items-center gap-4 border-b border-line pb-4">
               
               {mascotImg && (
-                <div className="relative h-28 w-28 shrink-0 overflow-visible bg-transparent sm:h-32 sm:w-32">
+                /* Saiz dikunci pada h-24 w-24 (atau h-28 di desktop) — sangat ngam dan tidak melimpah */
+                <div className="relative h-24 w-24 shrink-0 overflow-visible bg-transparent sm:h-28 sm:w-28">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={mascotImg}
                     alt="HEXA Chef Safari Mascot"
                     loading="eager"
                     fetchPriority="high"
-                    className="animate-van-shake h-full w-full object-contain p-0 origin-center scale-110"
+                    className="animate-van-shake h-full w-full object-contain p-0 origin-center"
                   />
                 </div>
               )}
 
+              {/* Ruangan Teks Nama: Menggunakan break-words supaya nama panjang automatik turun bawah tanpa terpotong */}
               <div className="min-w-0 flex-1">
-                <h3 className="font-display text-lg font-bold tracking-tight text-brand sm:text-xl truncate">{sel.name}</h3>
+                <h3 className="font-display text-lg font-bold tracking-tight text-brand sm:text-xl break-words whitespace-normal leading-tight">
+                  {sel.name}
+                </h3>
                 <p className="mt-1 text-xs sm:text-sm text-muted">
                   {sel.age ? `${sel.age} yrs` : "Age —"} · {sel.vegetarian}
                 </p>

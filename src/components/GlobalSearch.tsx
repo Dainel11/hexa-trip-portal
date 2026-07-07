@@ -85,7 +85,7 @@ export default function GlobalSearch({ entries, notFoundImg }: { entries: Direct
           <div className="animate-modal-in my-auto max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-line bg-canvas p-6 text-left shadow-2xl"
             onClick={(e) => e.stopPropagation()}>
             
-            {/* TUNAS SUNTIKAN HEADER MASKOT RASMI (SEJAJAR DAN SIMETRI) */}
+            {/* KORIDOR HEADER MASKOT (PAUTAN URL 17833... TELAH DIPERBETULKAN) */}
             <div className="flex items-center gap-4 border-b border-line pb-4">
               <div className="relative h-20 w-20 shrink-0 overflow-visible bg-transparent sm:h-24 sm:w-24">
                 {/* eslint-disable-next-line @next/next/no-img-element */}

@@ -13,8 +13,12 @@ function isGala(text: string) {
   const t = text.toLowerCase();
   return t.includes("dinner") || t.includes("gala") || t.includes("night");
 }
-function isSafari(text: string) {
-  return text.toLowerCase().includes("safari");
+
+// PEMBETULAN LOGIK SAFARI DINNER KETAT:
+// Kod hanya akan mengembalikan true jika mengandungi perkataan 'safari' DAN 'dinner' atau 'night'
+function isSafariDinnerCard(day: string, theme: string) {
+  const combined = `${day} ${theme}`.toLowerCase();
+  return combined.includes("safari") && (combined.includes("dinner") || combined.includes("night"));
 }
 
 export default async function Page() {
@@ -23,6 +27,7 @@ export default async function Page() {
   const fallback = [settings.safari_shirt_image, settings.waterworld_shirt_image, settings.gala_image];
   const confirmed = (v: string) => !["false", "no", "0"].includes((v || "").toLowerCase());
   const cards = dress.map((d, i) => ({ ...d, img: confirmed(d.confirmed) ? (d.image || fallback[i] || "") : "" }));
+  
   // Neutral gala inspirations (no Staff/Management split); images come from Config.
   // Shop URLs (executive request): staff can jump straight to the apparel store.
   const galaPair = [
@@ -51,7 +56,11 @@ export default async function Page() {
             <div className="mt-5 grid grid-cols-1 gap-6 md:grid-cols-3">
               {cards.map((c, i) => {
                 const gala = isGala(`${c.day} ${c.theme}`) && galaPair.length > 0;
-                const safari = isSafari(`${c.day} ${c.theme}`) && safariShops.length > 0;
+                
+                // PEMBETULAN PENAPIS BUTANG SAFARI SHOPPING HUB:
+                // Butang kini disekat hanya terbit di kad Safari Night Dinner (Kad Ketiga sahaja)
+                const safari = isSafariDinnerCard(c.day || "", c.theme || "") && safariShops.length > 0;
+                
                 return (
                   <article key={i} className="flex flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-sm">
                     {gala ? (

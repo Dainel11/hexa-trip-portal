@@ -80,7 +80,7 @@ export default function GlobalSearch({ entries, notFoundImg }: { entries: Direct
       </div>
 
       {sel && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-ink/50 p-4 pt-32 backdrop-blur-sm sm:items-center sm:pt-4"
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-ink/50 p-4 pt-56 backdrop-blur-sm sm:items-center sm:pt-4"
           role="dialog" aria-modal="true" aria-label={`Details for ${sel.name}`} onClick={() => setSel(null)}>
           <div className="animate-modal-in max-h-[80vh] sm:max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-line bg-canvas p-6 text-left shadow-2xl"
             onClick={(e) => e.stopPropagation()}>

@@ -64,20 +64,28 @@ export default async function Page() {
                 return (
                   <article key={i} className="flex flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-sm">
                     {gala ? (
-                      /* Mobile: tactile swipe deck (snap-x). Desktop (md+): classic side-by-side grid. */
-                      <div className="flex h-80 snap-x snap-mandatory gap-2 overflow-x-auto scroll-smooth bg-gradient-to-b from-brand-soft/30 to-surface p-2 no-scrollbar md:grid md:grid-cols-2 md:gap-1 md:overflow-visible">
-                        {galaPair.map((g) => (
-                          <figure key={g.label} className="flex w-full shrink-0 snap-center flex-col md:w-auto md:min-w-0">
-                            <SmartImage src={g.url} alt={g.label} className="min-h-0 w-full flex-1 rounded-lg object-contain" />
-                            <figcaption className="tag pt-1 text-center text-muted">{g.label}</figcaption>
-                            {g.shopUrl && (
-                              <a href={g.shopUrl} target="_blank" rel="noopener noreferrer"
-                                className="mx-auto mt-1.5 inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-brand px-4 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40">
-                                🛒 Beli Baju Di Sini
-                              </a>
-                            )}
-                          </figure>
-                        ))}
+                      /* Mobile: tactile swipe deck (snap-x) with safe interactive indicator bounds */
+                      <div className="relative flex flex-col bg-gradient-to-b from-brand-soft/30 to-surface p-2">
+                        
+                        {/* VISUAL CUE: Petunjuk swipe lembut hanya kelihatan di skrin telefon (md:hidden) */}
+                        <div className="mb-2 flex items-center justify-center gap-1.5 text-center text-[11px] font-semibold tracking-wide text-brand/80 animate-pulse md:hidden">
+                          <span>↔️ Leret (Swipe) kiri/kanan untuk Inspiration B</span>
+                        </div>
+
+                        <div className="flex h-80 snap-x snap-mandatory gap-2 overflow-x-auto scroll-smooth no-scrollbar md:grid md:grid-cols-2 md:gap-1 md:overflow-visible">
+                          {galaPair.map((g) => (
+                            <figure key={g.label} className="flex w-full shrink-0 snap-center flex-col md:w-auto md:min-w-0">
+                              <SmartImage src={g.url} alt={g.label} className="min-h-0 w-full flex-1 rounded-lg object-contain" />
+                              <figcaption className="tag pt-1 text-center text-muted">{g.label}</figcaption>
+                              {g.shopUrl && (
+                                <a href={g.shopUrl} target="_blank" rel="noopener noreferrer"
+                                  className="mx-auto mt-1.5 inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-brand px-4 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40">
+                                  🛒 Beli Baju Di Sini
+                                </a>
+                              )}
+                            </figure>
+                          ))}
+                        </div>
                       </div>
                     ) : (
                       /* h-80 — symmetric with the Gala deck block height. */

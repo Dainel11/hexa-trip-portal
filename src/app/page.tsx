@@ -53,7 +53,13 @@ export default async function Home() {
       </section>
 
       <div className="mx-auto max-w-content space-y-10 px-4 py-8">
-        <GlobalSearch entries={directory} notFoundImg={settings.not_found_pixel_image || ""} />
+        
+        {/* WIRED DENGAN BETUL: Memasukkan parameter settings={settings} ke dalam komponen carian global */}
+        <GlobalSearch 
+          entries={directory} 
+          notFoundImg={settings.not_found_pixel_image || ""} 
+          settings={settings} 
+        />
 
         {info.startDate && <Countdown date={info.startDate} />}
 

@@ -52,7 +52,7 @@ export default function GlobalSearch({ entries, notFoundImg }: { entries: Direct
           className="min-h-[48px] w-full rounded-full border border-line bg-surface py-3 pl-11 pr-4 text-base shadow-sm outline-none transition focus-visible:border-brand focus-visible:ring-2 focus-visible:ring-brand/40" />
 
         {term && (
-          <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-2xl border border-line bg-surface shadow-lg" role="listbox">
+          <div className="absolute z-50 mt-2 w-full overflow-hidden rounded-2xl border border-line bg-surface shadow-lg" role="listbox">
             {results.length ? results.map((e) => (
               <button key={e.empId} onClick={() => { setSel(e); }} role="option"
                 className="flex w-full items-center justify-between gap-2 px-4 py-3 text-left transition hover:bg-brand-soft/40 focus-visible:bg-brand-soft/40 focus-visible:outline-none">

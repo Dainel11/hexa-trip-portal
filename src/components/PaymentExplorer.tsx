@@ -180,7 +180,7 @@ function LockerInfo({ image }: { image?: string }) {
   return (
     <div className="text-center">
       <button onClick={() => setOpen(true)}
-        className="inline-flex min-h-[44px] items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-[#0e6e5c] shadow-sm ring-1 ring-black/5 transition animate-pulse hover:brightness-95 focus-visible:ring-2 focus-visible:ring-brand/40"
+        className="animate-pulse-glow inline-flex min-h-[44px] items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-[#0e6e5c] shadow-sm ring-1 ring-black/5 transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
         style={{ backgroundColor: "#facc15" }}>
         🔑 Info Sewa Loker Water World
       </button>
@@ -188,7 +188,7 @@ function LockerInfo({ image }: { image?: string }) {
       {open && (
         <div role="dialog" aria-modal="true" aria-label="Locker rental info"
           onClick={() => setOpen(false)}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-ink/50 p-4 backdrop-blur-sm">
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-ink/50 p-4 pt-10 backdrop-blur-sm sm:items-center sm:pt-4">
           <div onClick={(e) => e.stopPropagation()}
             className="animate-modal-in relative w-full max-w-md rounded-2xl border border-line bg-canvas p-4 shadow-2xl">
             <div className="mb-2 flex items-center justify-between">
@@ -197,7 +197,7 @@ function LockerInfo({ image }: { image?: string }) {
                 className="grid h-9 w-9 place-items-center rounded-full border border-line text-lg leading-none hover:bg-surface focus-visible:ring-2 focus-visible:ring-brand/40">×</button>
             </div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={image} className="mx-auto h-auto w-full max-w-md rounded-xl object-contain" alt="Locker Rental Info" />
+            <img src={image} loading="eager" fetchPriority="high" className="mx-auto h-auto w-full max-w-md rounded-xl object-contain" alt="Locker Rental Info" />
             <div className="mt-4 text-center">
               <button onClick={() => setOpen(false)}
                 className="rounded-full bg-brand px-5 py-2.5 text-sm font-medium text-white focus-visible:ring-2 focus-visible:ring-brand/40">Close</button>

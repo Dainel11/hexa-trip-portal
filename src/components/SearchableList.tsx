@@ -70,7 +70,7 @@ export default function SearchableList({
 
       {banners && banners.length > 0 && (
         <div aria-hidden={searching}
-          className={`grid grid-cols-1 gap-4 overflow-hidden transition-all duration-300 ease-in-out motion-reduce:transition-none sm:grid-cols-2 ${searching ? "mb-0 max-h-0 opacity-0" : "mb-6 max-h-[440px] opacity-100"}`}>
+          className={`grid grid-cols-1 gap-4 overflow-hidden transition-all duration-300 ease-in-out motion-reduce:transition-none sm:grid-cols-2 ${searching ? "mb-0 max-h-0 opacity-0" : "mb-6 max-h-[1000px] opacity-100 sm:max-h-[440px]"}`}>
           {banners.map((b) => (
             <figure key={b.label} className="overflow-hidden rounded-2xl border border-line bg-surface">
               <div className="flex items-center justify-center bg-gradient-to-b from-brand-soft/30 to-surface p-3">
@@ -86,7 +86,7 @@ export default function SearchableList({
 
       {summary && (
         <div aria-hidden={searching}
-          className={`overflow-hidden transition-all duration-300 ease-in-out motion-reduce:transition-none ${searching ? "mb-0 max-h-0 opacity-0" : "mb-6 max-h-[600px] opacity-100"}`}>
+          className={`overflow-hidden transition-all duration-300 ease-in-out motion-reduce:transition-none ${searching ? "mb-0 max-h-0 opacity-0" : "mb-6 max-h-[1100px] opacity-100 md:max-h-[600px]"}`}>
           {summary}
         </div>
       )}

@@ -20,9 +20,10 @@ export default async function Page() {
   const confirmed = (v: string) => !["false", "no", "0"].includes((v || "").toLowerCase());
   const cards = dress.map((d, i) => ({ ...d, img: confirmed(d.confirmed) ? (d.image || fallback[i] || "") : "" }));
   // Neutral gala inspirations (no Staff/Management split); images come from Config.
+  // Shop URLs (executive request): staff can jump straight to the apparel store.
   const galaPair = [
-    { url: settings.gala_image_a || settings.gala_management_image, label: "Inspiration A" },
-    { url: settings.gala_image_b || settings.gala_staff_image, label: "Inspiration B" },
+    { url: settings.gala_image_a || settings.gala_management_image, label: "Inspiration A", shopUrl: settings.gala_inspiration_a_shop_url || "" },
+    { url: settings.gala_image_b || settings.gala_staff_image, label: "Inspiration B", shopUrl: settings.gala_inspiration_b_shop_url || "" },
   ].filter((g) => g.url);
 
   return (
@@ -40,11 +41,18 @@ export default async function Page() {
                 return (
                   <article key={i} className="flex flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-sm">
                     {gala ? (
-                      <div className="grid h-72 grid-cols-2 gap-1 bg-gradient-to-b from-brand-soft/30 to-surface p-2">
+                      /* Mobile: tactile swipe deck (snap-x). Desktop (md+): classic side-by-side grid. */
+                      <div className="flex h-80 snap-x snap-mandatory gap-2 overflow-x-auto scroll-smooth bg-gradient-to-b from-brand-soft/30 to-surface p-2 no-scrollbar md:grid md:grid-cols-2 md:gap-1 md:overflow-visible">
                         {galaPair.map((g) => (
-                          <figure key={g.label} className="flex min-h-0 flex-col">
+                          <figure key={g.label} className="flex w-full shrink-0 snap-center flex-col md:w-auto md:min-w-0">
                             <SmartImage src={g.url} alt={g.label} className="min-h-0 w-full flex-1 rounded-lg object-contain" />
                             <figcaption className="tag pt-1 text-center text-muted">{g.label}</figcaption>
+                            {g.shopUrl && (
+                              <a href={g.shopUrl} target="_blank" rel="noopener noreferrer"
+                                className="mx-auto mt-1.5 inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-brand px-4 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40">
+                                🛒 Beli Baju Di Sini
+                              </a>
+                            )}
                           </figure>
                         ))}
                       </div>

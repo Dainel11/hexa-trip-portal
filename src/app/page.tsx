@@ -46,7 +46,7 @@ export default async function Home() {
           </div>
           {info.heroImage && (
             <div className="reveal overflow-hidden rounded-2xl border border-line bg-surface shadow-sm">
-              <SmartImage src={info.heroImage} alt={info.eventName} className="mx-auto max-h-72 w-full object-contain" />
+              <SmartImage src={info.heroImage} alt={info.eventName} eager className="mx-auto max-h-72 w-full object-contain" />
             </div>
           )}
         </div>

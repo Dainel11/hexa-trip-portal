@@ -14,10 +14,18 @@ export function toRenderableImage(src?: string): string {
 }
 
 export default function SmartImage({
-  src, alt, className = "",
-}: { src?: string; alt: string; className?: string }) {
+  src, alt, className = "", eager = false,
+}: { src?: string; alt: string; className?: string; eager?: boolean }) {
   const url = toRenderableImage(src);
   if (!url) return null;
   // eslint-disable-next-line @next/next/no-img-element
-  return <img src={url} alt={alt} loading="lazy" className={className} />;
+  return (
+    <img
+      src={url}
+      alt={alt}
+      loading={eager ? "eager" : "lazy"}
+      fetchPriority={eager ? "high" : "auto"}
+      className={className}
+    />
+  );
 }

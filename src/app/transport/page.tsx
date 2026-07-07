@@ -8,10 +8,26 @@ import { rm } from "@/lib/format";
 export const revalidate = 60;
 export const metadata = { title: "Transport" };
 
-function Metric({ label, stats, motion }: { label: string; stats: [string, number][]; motion: "bus" | "van" | "car" }) {
+/**
+ * Batch C-4: unified transport macro card.
+ *  - Vehicle image is a transparent PNG fetched dynamically from Config
+ *    (transport_bus_image / transport_van_image / transport_car_image).
+ *  - Sits on an asphalt-grey road (#4b5563) with dashed yellow lane marks.
+ *  - All three vehicles share the same slow, gentle van-shake motion.
+ *  - Quantity stats stay locked at the top of the card (never obscured).
+ */
+function Metric({
+  label,
+  stats,
+  image,
+}: {
+  label: string;
+  stats: [string, number][];
+  image?: string;
+}) {
   return (
     <div className="rounded-2xl border border-line bg-surface p-5">
-      {/* Numbers stay locked at the top — never hidden by the animation */}
+      {/* Numbers stay locked at the top — never hidden by the animation. */}
       <div className="mb-3 flex items-center justify-between gap-2">
         <span className="font-display text-base font-semibold">{label}</span>
         <span className="flex items-center gap-4">
@@ -23,20 +39,34 @@ function Metric({ label, stats, motion }: { label: string; stats: [string, numbe
           ))}
         </span>
       </div>
-      <div className="relative h-32 w-full overflow-hidden rounded-xl bg-[#eaf1ee]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={`/veh/${motion}.png`} alt={`${label} diorama`}
-          className={`absolute inset-0 h-full w-full object-contain ${motion === "van" ? "animate-van-shake" : motion === "car" ? "animate-scene-drift" : "animate-bus-idle2"}`} />
-        {motion === "bus" && (
-          <span aria-hidden className="pointer-events-none absolute bottom-6 left-6">
-            <span className="board-walk absolute block h-1.5 w-1.5 rounded-[1px] bg-[#c0653a]" style={{ "--walk": "40px", animationDelay: "0s" } as React.CSSProperties} />
-            <span className="board-walk absolute block h-1.5 w-1.5 rounded-[1px] bg-[#3f6fb0]" style={{ "--walk": "40px", animationDelay: "1s" } as React.CSSProperties} />
-            <span className="board-walk absolute block h-1.5 w-1.5 rounded-[1px] bg-[#4a7c59]" style={{ "--walk": "40px", animationDelay: "2s" } as React.CSSProperties} />
+
+      {/* Asphalt road (#4b5563) with yellow dashed centre lane. */}
+      <div
+        className="relative h-32 w-full overflow-hidden rounded-xl"
+        style={{ backgroundColor: "#4b5563" }}
+      >
+        {/* Dashed yellow lane — pure CSS, no extra DOM cost. */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute left-0 right-0 top-1/2 h-[6px] -translate-y-1/2"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(to right, #facc15 0 22px, transparent 22px 44px)",
+          }}
+        />
+        {image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={image}
+            alt={`${label} vehicle`}
+            loading="eager"
+            fetchPriority="high"
+            className="animate-van-shake absolute inset-0 h-full w-full object-contain px-4"
+          />
+        ) : (
+          <span className="tag absolute inset-0 grid place-items-center text-center text-white/70">
+            Image coming soon
           </span>
-        )}
-        {motion === "car" && (
-          <span aria-hidden className="headlight-glow pointer-events-none absolute left-[40%] top-[56%] h-10 w-16 -translate-x-1/2 -translate-y-1/2"
-            style={{ background: "radial-gradient(circle, rgba(255,214,80,0.85) 0%, rgba(255,214,80,0) 70%)" }} />
         )}
       </div>
     </div>
@@ -61,11 +91,17 @@ export default async function Page() {
   const count = (t: string) => groups.filter((g) => g.type === t).length;
   const pax = (t: string) => groups.filter((g) => g.type === t).reduce((s, g) => s + g.pax, 0);
 
+  // Vehicle artwork now lives in Google Sheets Config (transparent PNGs) so the
+  // ops team can swap it without redeploying. Empty → placeholder tag renders.
+  const busImg = settings.transport_bus_image || "";
+  const vanImg = settings.transport_van_image || "";
+  const carImg = settings.transport_car_image || "";
+
   const summary = (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-      <Metric label="Buses" motion="bus" stats={[["Buses", count("BUS")], ["Passengers", pax("BUS")]]} />
-      <Metric label="Vans" motion="van" stats={[["Vans", count("VAN")], ["Passengers", pax("VAN")]]} />
-      <Metric label="Cars" motion="car" stats={[["Cars", count("CAR")]]} />
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <Metric label="Buses" image={busImg} stats={[["Buses", count("BUS")], ["Passengers", pax("BUS")]]} />
+      <Metric label="Vans" image={vanImg} stats={[["Vans", count("VAN")], ["Passengers", pax("VAN")]]} />
+      <Metric label="Cars" image={carImg} stats={[["Cars", count("CAR")], ["Passengers", pax("CAR")]]} />
     </div>
   );
 

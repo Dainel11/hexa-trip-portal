@@ -40,7 +40,7 @@ export default async function Page() {
   const safariShops: SafariShopItem[] = [
     { label: "🤠 Set Baju Explorer / Ranger", url: settings.safari_shop_url_1 || "" },
     { label: "🐯 Cekal Telinga & Ekor Haiwan", url: settings.safari_shop_url_2 || "" },
-    { label: "🐗 Topeng Haiwan 3D", url: settings.safari_shop_url_3 || "" },
+    { label: "🎭 Topeng Haiwan 3D", url: settings.safari_shop_url_3 || "" },
     { label: "🦁 Baju Jumpsuit Onesies Haiwan", url: settings.safari_shop_url_4 || "" },
   ].filter((s) => s.url);
 
@@ -69,7 +69,7 @@ export default async function Page() {
                         
                         {/* VISUAL CUE: Petunjuk swipe lembut hanya kelihatan di skrin telefon (md:hidden) */}
                         <div className="mb-2 flex items-center justify-center gap-1.5 text-center text-[11px] font-semibold tracking-wide text-brand/80 animate-pulse md:hidden">
-                          <span>↔️ Leret (Swipe) kiri/kanan untuk Inspiration B</span>
+                          <span>↔️ (Swipe) kiri/kanan untuk Inspiration B</span>
                         </div>
 
                         <div className="flex h-80 snap-x snap-mandatory gap-2 overflow-x-auto scroll-smooth no-scrollbar md:grid md:grid-cols-2 md:gap-1 md:overflow-visible">

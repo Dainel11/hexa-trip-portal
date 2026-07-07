@@ -17,19 +17,15 @@ export default function CondoMapButton({
 }) {
   const [open, setOpen] = useState(false);
 
-  // Close on ESC + lock body scroll while the map modal is open.
+  // Close on ESC. Body scroll-lock removed (Batch C-5): the overlay itself
+  // scrolls (overflow-y-auto), so the browser viewport never freezes.
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
     };
     document.addEventListener("keydown", onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prev;
-    };
+    return () => document.removeEventListener("keydown", onKey);
   }, [open]);
 
   if (!image) return null;
@@ -56,7 +52,7 @@ export default function CondoMapButton({
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="animate-modal-in relative w-full max-w-4xl rounded-2xl border border-line bg-canvas p-4 shadow-2xl sm:p-5"
+            className="animate-modal-in relative max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-2xl border border-line bg-canvas p-4 shadow-2xl sm:p-5"
           >
             <div className="mb-3 flex items-center justify-between gap-3">
               <h3 className="font-display text-base font-semibold sm:text-lg">

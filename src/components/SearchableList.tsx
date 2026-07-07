@@ -86,7 +86,7 @@ export default function SearchableList({
 
       {summary && (
         <div aria-hidden={searching}
-          className={`overflow-hidden transition-all duration-300 ease-in-out motion-reduce:transition-none ${searching ? "mb-0 max-h-0 opacity-0" : "mb-6 max-h-[1100px] opacity-100 md:max-h-[600px]"}`}>
+          className={`overflow-hidden transition-all duration-300 ease-in-out motion-reduce:transition-none ${searching ? "mb-0 max-h-0 opacity-0" : "mb-6 max-h-[1400px] opacity-100 md:max-h-[700px]"}`}>
           {summary}
         </div>
       )}

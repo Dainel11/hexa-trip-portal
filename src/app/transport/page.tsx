@@ -9,11 +9,12 @@ export const revalidate = 60;
 export const metadata = { title: "Transport" };
 
 /**
- * Batch C-4: unified transport macro card.
- *  - Vehicle image is a transparent PNG fetched dynamically from Config
- *    (transport_bus_image / transport_van_image / transport_car_image).
- *  - Sits on an asphalt-grey road (#4b5563) with dashed yellow lane marks.
- *  - All three vehicles share the same slow, gentle van-shake motion.
+ * Batch C-5: pure-image transport macro card.
+ *  - Asphalt road + lane lines removed — vehicle PNGs (transparent bg) float
+ *    directly on the clean base card surface, blending with the portal theme.
+ *  - Images pulled live from Config: transport_bus_image / transport_van_image
+ *    / transport_car_image. Empty key → "Image coming soon" placeholder.
+ *  - All three share the same slow engine-idle vibration (animate-van-shake).
  *  - Quantity stats stay locked at the top of the card (never obscured).
  */
 function Metric({
@@ -40,35 +41,20 @@ function Metric({
         </span>
       </div>
 
-      {/* Asphalt road (#4b5563) with yellow dashed centre lane. */}
-      <div
-        className="relative h-32 w-full overflow-hidden rounded-xl"
-        style={{ backgroundColor: "#4b5563" }}
-      >
-        {/* Dashed yellow lane — pure CSS, no extra DOM cost. */}
-        <span
-          aria-hidden
-          className="pointer-events-none absolute left-0 right-0 top-1/2 h-[6px] -translate-y-1/2"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(to right, #facc15 0 22px, transparent 22px 44px)",
-          }}
+      {image ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={image}
+          alt={`${label} vehicle`}
+          loading="eager"
+          fetchPriority="high"
+          className="animate-van-shake mx-auto h-48 w-full object-contain transition-transform duration-300 md:h-56"
         />
-        {image ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={image}
-            alt={`${label} vehicle`}
-            loading="eager"
-            fetchPriority="high"
-            className="animate-van-shake absolute inset-0 h-full w-full object-contain px-4"
-          />
-        ) : (
-          <span className="tag absolute inset-0 grid place-items-center text-center text-white/70">
-            Image coming soon
-          </span>
-        )}
-      </div>
+      ) : (
+        <div className="grid h-48 w-full place-items-center rounded-xl border border-dashed border-line md:h-56">
+          <span className="tag text-muted">Image coming soon</span>
+        </div>
+      )}
     </div>
   );
 }

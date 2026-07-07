@@ -190,7 +190,7 @@ function LockerInfo({ image }: { image?: string }) {
           onClick={() => setOpen(false)}
           className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-ink/50 p-4 pt-10 backdrop-blur-sm sm:items-center sm:pt-4">
           <div onClick={(e) => e.stopPropagation()}
-            className="animate-modal-in relative w-full max-w-md rounded-2xl border border-line bg-canvas p-4 shadow-2xl">
+            className="animate-modal-in relative max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl border border-line bg-canvas p-4 shadow-2xl">
             <div className="mb-2 flex items-center justify-between">
               <h3 className="font-display text-lg font-semibold">Sewa Loker — Water World</h3>
               <button onClick={() => setOpen(false)} aria-label="Close"

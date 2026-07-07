@@ -37,7 +37,8 @@ export default function GlobalSearch({ entries, notFoundImg }: { entries: Direct
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
-  useEffect(() => { document.body.style.overflow = sel ? "hidden" : ""; return () => { document.body.style.overflow = ""; }; }, [sel]);
+  // Body scroll-lock removed (Batch C-5): it froze the viewport on mobile and
+  // desktop. The overlay now scrolls internally instead.
 
   return (
     <section className="mx-auto w-full max-w-xl text-center">
@@ -81,9 +82,9 @@ export default function GlobalSearch({ entries, notFoundImg }: { entries: Direct
       </div>
 
       {sel && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/50 p-0 backdrop-blur-sm sm:items-center sm:p-4"
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-ink/50 p-4 pt-10 backdrop-blur-sm sm:items-center sm:pt-4"
           role="dialog" aria-modal="true" aria-label={`Details for ${sel.name}`} onClick={() => setSel(null)}>
-          <div className="animate-modal-in max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-t-3xl border border-line bg-canvas p-6 text-left shadow-2xl sm:rounded-3xl"
+          <div className="animate-modal-in max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-line bg-canvas p-6 text-left shadow-2xl"
             onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between gap-3">
               <div>

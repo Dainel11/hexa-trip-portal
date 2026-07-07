@@ -3,6 +3,7 @@ import PageHeader from "@/components/PageHeader";
 import SearchableList from "@/components/SearchableList";
 import EmptyState from "@/components/EmptyState";
 import SmartImage from "@/components/SmartImage";
+import SafariShopMenu, { type SafariShopItem } from "@/components/SafariShopMenu";
 import { ShirtIcon } from "@/components/icons";
 
 export const revalidate = 60;
@@ -11,6 +12,9 @@ export const metadata = { title: "Shirts & Dress Code" };
 function isGala(text: string) {
   const t = text.toLowerCase();
   return t.includes("dinner") || t.includes("gala") || t.includes("night");
+}
+function isSafari(text: string) {
+  return text.toLowerCase().includes("safari");
 }
 
 export default async function Page() {
@@ -26,6 +30,15 @@ export default async function Page() {
     { url: settings.gala_image_b || settings.gala_staff_image, label: "Inspiration B", shopUrl: settings.gala_inspiration_b_shop_url || "" },
   ].filter((g) => g.url);
 
+  // Safari shopping hub (Batch C-5): 4 category links from Config.
+  // Empty keys are dropped here; if all 4 are blank the CTA never renders.
+  const safariShops: SafariShopItem[] = [
+    { label: "🤠 Set Baju Explorer / Ranger", url: settings.safari_shop_url_1 || "" },
+    { label: "🐯 Cekal Telinga & Ekor Haiwan", url: settings.safari_shop_url_2 || "" },
+    { label: "🐗 Topeng Haiwan 3D", url: settings.safari_shop_url_3 || "" },
+    { label: "🦁 Baju Jumpsuit Onesies Haiwan", url: settings.safari_shop_url_4 || "" },
+  ].filter((s) => s.url);
+
   return (
     <>
       <PageHeader eyebrow="04 · Gear" title="Shirts & Dress Code"
@@ -38,6 +51,7 @@ export default async function Page() {
             <div className="mt-5 grid grid-cols-1 gap-6 md:grid-cols-3">
               {cards.map((c, i) => {
                 const gala = isGala(`${c.day} ${c.theme}`) && galaPair.length > 0;
+                const safari = isSafari(`${c.day} ${c.theme}`) && safariShops.length > 0;
                 return (
                   <article key={i} className="flex flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-sm">
                     {gala ? (
@@ -57,7 +71,8 @@ export default async function Page() {
                         ))}
                       </div>
                     ) : (
-                      <div className="flex h-72 items-center justify-center bg-gradient-to-b from-brand-soft/30 to-surface p-3">
+                      /* h-80 — symmetric with the Gala deck block height. */
+                      <div className="flex h-80 items-center justify-center bg-gradient-to-b from-brand-soft/30 to-surface p-3">
                         {c.img ? (
                           <SmartImage src={c.img} alt={c.theme} className="h-full w-full object-contain" />
                         ) : (
@@ -73,6 +88,7 @@ export default async function Page() {
                       <h3 className="mt-2 font-display text-lg font-semibold">{c.theme}</h3>
                       {c.teeColour && <p className="tag mt-1 text-muted">Colour: {c.teeColour}</p>}
                       {c.description && <p className="mt-1.5 text-sm leading-relaxed text-muted">{c.description}</p>}
+                      {safari && <SafariShopMenu items={safariShops} />}
                     </div>
                   </article>
                 );

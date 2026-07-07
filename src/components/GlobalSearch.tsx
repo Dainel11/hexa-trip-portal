@@ -16,15 +16,14 @@ function Field({ label, children, href }: { label: string; children: React.React
   return href ? <Link href={href} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 rounded-xl">{body}</Link> : body;
 }
 
-// SUNTIKAN PROP SETTINGS: Menambahkan "settings" ke dalam parameter komponen agar boleh dibaca dari Google Sheets
 export default function GlobalSearch({ 
   entries, 
   notFoundImg,
-  settings = {} // <-- Panggil objek konfigurasi Google Sheets dengan selamat
+  settings = {}
 }: { 
   entries: DirectoryEntry[]; 
   notFoundImg?: string;
-  settings?: Record<string, string>; // <-- Definisikan jenis data setting
+  settings?: Record<string, string>;
 }) {
   const [q, setQ] = useState("");
   const [sel, setSel] = useState<DirectoryEntry | null>(null);
@@ -47,7 +46,6 @@ export default function GlobalSearch({
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  // Ambil URL maskot secara dinamik dari baris Google Sheets (key: loading_pixel_image)
   const mascotImg = settings?.loading_pixel_image || "";
 
   return (
@@ -97,19 +95,18 @@ export default function GlobalSearch({
           <div className="animate-modal-in my-auto max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-line bg-canvas p-6 text-left shadow-2xl"
             onClick={(e) => e.stopPropagation()}>
             
-            {/* HEADER KAD PROFIL SEJAJAR DENGAN MASKOT DARI GOOGLE SHEETS */}
+            {/* KOORDINAT HEADER BESAR: Saiz maskot dikembangkan penuh secara simetri */}
             <div className="flex items-center gap-4 border-b border-line pb-4">
               
-              {/* Memaparkan gambar hanya jika pautan key wujud di Google Sheets */}
               {mascotImg && (
-                <div className="relative h-20 w-20 shrink-0 overflow-visible bg-transparent sm:h-24 sm:w-24">
+                <div className="relative h-28 w-28 shrink-0 overflow-visible bg-transparent sm:h-32 sm:w-32">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={mascotImg} // <-- 100% Membaca URL live secara dinamik dari baris Google Sheets!
+                    src={mascotImg}
                     alt="HEXA Chef Safari Mascot"
                     loading="eager"
                     fetchPriority="high"
-                    className="animate-van-shake h-full w-full object-contain p-0 origin-center"
+                    className="animate-van-shake h-full w-full object-contain p-0 origin-center scale-110"
                   />
                 </div>
               )}

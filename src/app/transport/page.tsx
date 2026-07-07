@@ -9,13 +9,10 @@ export const revalidate = 60;
 export const metadata = { title: "Transport" };
 
 /**
- * Batch C-5: pure-image transport macro card.
- *  - Asphalt road + lane lines removed — vehicle PNGs (transparent bg) float
- *    directly on the clean base card surface, blending with the portal theme.
- *  - Images pulled live from Config: transport_bus_image / transport_van_image
- *    / transport_car_image. Empty key → "Image coming soon" placeholder.
- *  - All three share the same slow engine-idle vibration (animate-van-shake).
- *  - Quantity stats stay locked at the top of the card (never obscured).
+ * Batch C-5 Restructured Layout:
+ *  - Removed restrictiveness of overflow-hidden layout wrappers.
+ *  - Enforced a higher absolute-inset scaling matrix to explode the retro pixel art dimensions cleanly.
+ *  - Maintained safe structural boundary configurations for outer background cards.
  */
 function Metric({
   label,
@@ -41,7 +38,8 @@ function Metric({
         </span>
       </div>
 
-      <div className="flex h-48 w-full items-center justify-center overflow-hidden rounded-xl bg-transparent md:h-56">
+      {/* RE-ARCHITECTED IMAGE BLOCK: Using relative container with overflow-visible to maximize image dimensions */}
+      <div className="relative mt-2 flex min-h-[200px] w-full items-center justify-center overflow-visible bg-transparent sm:min-h-[240px]">
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -49,10 +47,10 @@ function Metric({
             alt={`${label} vehicle`}
             loading="eager"
             fetchPriority="high"
-            className="animate-van-shake mx-auto h-full w-full object-contain p-0 origin-center scale-115 md:scale-135 transition-transform duration-300"
+            className="animate-van-shake absolute inset-0 mx-auto h-full w-full object-contain p-0 origin-center scale-150 transition-transform duration-300 sm:scale-165"
           />
         ) : (
-          <div className="grid h-full w-full place-items-center rounded-xl border border-dashed border-line">
+          <div className="grid h-48 w-full place-items-center rounded-xl border border-dashed border-line md:h-56">
             <span className="tag text-muted">Image coming soon</span>
           </div>
         )}

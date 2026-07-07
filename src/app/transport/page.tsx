@@ -41,20 +41,22 @@ function Metric({
         </span>
       </div>
 
-      {image ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={image}
-          alt={`${label} vehicle`}
-          loading="eager"
-          fetchPriority="high"
-          className="animate-van-shake mx-auto h-48 w-full object-contain transition-transform duration-300 md:h-56"
-        />
-      ) : (
-        <div className="grid h-48 w-full place-items-center rounded-xl border border-dashed border-line md:h-56">
-          <span className="tag text-muted">Image coming soon</span>
-        </div>
-      )}
+      <div className="flex h-48 w-full items-center justify-center overflow-hidden rounded-xl bg-transparent md:h-56">
+        {image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={image}
+            alt={`${label} vehicle`}
+            loading="eager"
+            fetchPriority="high"
+            className="animate-van-shake mx-auto h-full w-full object-contain p-0 origin-center scale-115 md:scale-135 transition-transform duration-300"
+          />
+        ) : (
+          <div className="grid h-full w-full place-items-center rounded-xl border border-dashed border-line">
+            <span className="tag text-muted">Image coming soon</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

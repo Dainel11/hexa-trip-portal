@@ -1,6 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
-import { rm } from "@/lib/format";
+import { rm, phoneDisplay, waHref } from "@/lib/format";
+import { WhatsappIcon } from "@/components/icons";
 import { calcTotal, type Breakdown, type PaymentRules } from "@/lib/payment";
 
 const TONE: Record<string, string> = {
@@ -10,7 +11,7 @@ const TONE: Record<string, string> = {
   infant: "bg-brand-soft text-brand",
 };
 
-export default function PaymentExplorer({ breakdowns, rules, bank, lockerImage, notFoundImg }: { breakdowns: Breakdown[]; rules: PaymentRules; bank?: BankInfo; lockerImage?: string; notFoundImg?: string }) {
+export default function PaymentExplorer({ breakdowns, rules, bank, confirm, lockerImage, notFoundImg }: { breakdowns: Breakdown[]; rules: PaymentRules; bank?: BankInfo; confirm?: ConfirmInfo; lockerImage?: string; notFoundImg?: string }) {
   const [q, setQ] = useState("");
   const term = q.trim().toLowerCase();
   const matches = useMemo(
@@ -76,12 +77,13 @@ export default function PaymentExplorer({ breakdowns, rules, bank, lockerImage, 
       <Calculator rules={rules} />
 
       {/* ── Bank / DuitNow payment instructions ── */}
-      <BankCard bank={bank} />
+      <BankCard bank={bank} confirm={confirm} />
     </div>
   );
 }
 
 type BankInfo = { bankName: string; accountName: string; accountNumber: string; qrUrl: string; reference: string };
+type ConfirmInfo = { message: string; name: string; phone: string; statusNote: string };
 
 function CopyButton({ value }: { value: string }) {
   const [copied, setCopied] = useState(false);
@@ -98,35 +100,63 @@ function CopyButton({ value }: { value: string }) {
   );
 }
 
-function BankCard({ bank }: { bank?: BankInfo }) {
+function BankCard({ bank, confirm }: { bank?: BankInfo; confirm?: ConfirmInfo }) {
   if (!bank || (!bank.accountNumber && !bank.bankName)) return null;
+  const showConfirm = !!confirm && !!(confirm.message || confirm.name || confirm.phone);
   return (
     <section>
       <h2 className="font-display text-2xl font-semibold tracking-tight">How to pay</h2>
       <p className="mt-1 text-sm text-muted">Bank transfer or DuitNow QR. Please use the reference below.</p>
-      <div className="mx-auto mt-4 grid max-w-2xl gap-5 rounded-2xl border border-line bg-surface p-6 sm:grid-cols-[1.3fr_1fr] sm:items-center">
-        <dl className="space-y-3 text-sm">
-          {bank.bankName && (<div><dt className="tag text-muted">Bank</dt><dd className="font-medium">{bank.bankName}</dd></div>)}
-          {bank.accountName && (<div><dt className="tag text-muted">Account name</dt><dd className="font-medium">{bank.accountName}</dd></div>)}
-          {bank.accountNumber && (
-            <div>
-              <dt className="tag text-muted">Account number</dt>
-              <dd className="flex flex-wrap items-center gap-2">
-                <span className="font-mono text-base font-semibold tracking-wide">{bank.accountNumber}</span>
-                <CopyButton value={bank.accountNumber} />
-              </dd>
-            </div>
+      <div className="mx-auto mt-4 max-w-2xl rounded-2xl border border-line bg-surface p-6">
+        <div className="grid gap-5 sm:grid-cols-[1.3fr_1fr] sm:items-center">
+          <dl className="space-y-3 text-sm">
+            {bank.bankName && (<div><dt className="tag text-muted">Bank</dt><dd className="font-medium">{bank.bankName}</dd></div>)}
+            {bank.accountName && (<div><dt className="tag text-muted">Account name</dt><dd className="font-medium">{bank.accountName}</dd></div>)}
+            {bank.accountNumber && (
+              <div>
+                <dt className="tag text-muted">Account number</dt>
+                <dd className="flex flex-wrap items-center gap-2">
+                  <span className="font-mono text-base font-semibold tracking-wide">{bank.accountNumber}</span>
+                  <CopyButton value={bank.accountNumber} />
+                </dd>
+              </div>
+            )}
+            {bank.reference && (<div><dt className="tag text-muted">Payment reference</dt><dd className="font-medium">{bank.reference}</dd></div>)}
+          </dl>
+          {bank.qrUrl && (
+            <figure className="mx-auto w-full max-w-[300px]">
+              <div className="mx-auto aspect-square w-full overflow-hidden rounded-xl border border-line bg-white p-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={bank.qrUrl} alt="DuitNow QR code" width={300} height={300} loading="lazy" className="h-full w-full object-contain" />
+              </div>
+              <figcaption className="tag mt-2 text-center text-muted">Scan with any banking app</figcaption>
+            </figure>
           )}
-          {bank.reference && (<div><dt className="tag text-muted">Payment reference</dt><dd className="font-medium">{bank.reference}</dd></div>)}
-        </dl>
-        {bank.qrUrl && (
-          <figure className="mx-auto w-full max-w-[300px]">
-            <div className="mx-auto aspect-square w-full overflow-hidden rounded-xl border border-line bg-white p-3">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={bank.qrUrl} alt="DuitNow QR code" width={300} height={300} loading="lazy" className="h-full w-full object-contain" />
-            </div>
-            <figcaption className="tag mt-2 text-center text-muted">Scan with any banking app</figcaption>
-          </figure>
+        </div>
+
+        {/* ── Payment Confirmation (data-driven; sits inside the same card) ── */}
+        {showConfirm && (
+          <div className="mt-6 border-t border-line pt-5">
+            <h3 className="flex items-center gap-2 font-display text-base font-semibold">
+              <span aria-hidden className="grid h-5 w-5 place-items-center rounded-full bg-brand-soft text-[11px] font-bold text-brand">✓</span>
+              Payment Confirmation
+            </h3>
+            {confirm!.message && <p className="mt-1.5 text-sm leading-relaxed text-muted">{confirm!.message}</p>}
+            {confirm!.name && (
+              <p className="mt-3 text-sm"><span className="tag text-muted">Finance PIC</span><br /><span className="font-medium">{confirm!.name}</span></p>
+            )}
+            {confirm!.phone && (
+              <div className="mt-3">
+                <a href={waHref(confirm!.phone)} target="_blank" rel="noopener noreferrer"
+                  className="group inline-flex min-h-[40px] items-center gap-2.5 rounded-full border border-line bg-surface px-4 py-2 text-sm font-medium shadow-sm transition-all duration-200 hover:scale-[1.02] hover:border-brand hover:bg-brand-soft/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40">
+                  <WhatsappIcon className="h-[18px] w-[18px] text-brand" />
+                  <span>WhatsApp {confirm!.name || "Finance PIC"}</span>
+                </a>
+                <p className="mt-1.5 pl-1 text-sm font-medium tracking-wide text-muted">{phoneDisplay(confirm!.phone)}</p>
+              </div>
+            )}
+            {confirm!.statusNote && <p className="tag mt-3 text-muted">{confirm!.statusNote}</p>}
+          </div>
         )}
       </div>
     </section>

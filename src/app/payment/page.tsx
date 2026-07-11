@@ -18,10 +18,17 @@ export default async function Page() {
     reference: settings.payment_reference || "",
   };
   const lockerImage = settings.locker_rental_image || "";
+  // Payment Confirmation block (data-driven; HR edits via Config sheet only).
+  const confirm = {
+    message: settings.payment_confirmation_message || "",
+    name: settings.payment_contact_name || "",
+    phone: settings.payment_contact_phone || "",
+    statusNote: settings.payment_status_note || "",
+  };
 
   if (!SHOW_PAYMENTS)
     return (<><PageHeader eyebrow="06 · Money" title="Payment" />
-      <div className="mx-auto max-w-content px-4 py-8"><PaymentExplorer breakdowns={[]} rules={rules} bank={bank} lockerImage={lockerImage} notFoundImg={settings.not_found_pixel_image || ""} /></div></>);
+      <div className="mx-auto max-w-content px-4 py-8"><PaymentExplorer breakdowns={[]} rules={rules} bank={bank} confirm={confirm} lockerImage={lockerImage} notFoundImg={settings.not_found_pixel_image || ""} /></div></>);
 
   const pax = (await getPax()) || [];
   const byStaff = groupBy(pax.filter((p) => p.staffName), (p) => p.staffName);
@@ -37,7 +44,7 @@ export default async function Page() {
       <PageHeader eyebrow="06 · Money" title="Payment"
         intro="Pecahan kos per orang bila bawa keluarga, dan calculator untuk kira sendiri." />
       <div className="mx-auto max-w-content px-4 py-8">
-        <PaymentExplorer breakdowns={breakdowns} rules={rules} bank={bank} lockerImage={lockerImage} notFoundImg={settings.not_found_pixel_image || ""} />
+        <PaymentExplorer breakdowns={breakdowns} rules={rules} bank={bank} confirm={confirm} lockerImage={lockerImage} notFoundImg={settings.not_found_pixel_image || ""} />
       </div>
     </>
   );
